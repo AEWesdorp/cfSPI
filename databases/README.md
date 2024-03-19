@@ -12,4 +12,4 @@ Within this directory, you will find nine databases discussed in our manuscript:
 - **EPRSFv46MCAspDM** also known as **dREM.258**; 
 - **EPRSFv64MCAspDM** also known as **dREM.260**; 
 
-For details on the database compositon we would like to refer to the manuscript **XXX** itself. Supplementary Table 5 thereby offers details on the construction of each database. Here, we  provide the *seqid2taxid.map* files utilized in creating these nine databases. Thereby, for example, we used the ***RS_seqid2taxid.map*** for the construction of the **RS** database, ***EPRSc2_ seqid2taxid.map*** for the construction of the **EPRSc2**, and so forth. 
+For details on the database compositon we would like to refer to the manuscript itself. Supplementary Table 5 thereby offers details on the construction of each database. Here, we  provide the *seqid2taxid.map* files utilized in creating these nine databases. Thereby, for example, we used the ***RS_seqid2taxid.map*** for the construction of the **RS** database, ***EPRSc2_ seqid2taxid.map*** for the construction of the **EPRSc2**, and so forth. 
