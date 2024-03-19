@@ -1,18 +1,24 @@
 ### cfDNA read simulations
 
-To assess the accuracy of Aspergillus classification and determine the Limit of Significant detection (LoSD), we simulated Illumina reads resembling cell-free DNA (cfDNA) from fungal genomes sourced from the NCBI RefSeq. This process generated a total of 87 simulated datasets, comprising 54 Aspergillus genomes, 7 Penicillium genomes, and 25 genomes from other pathogenic fungi. For specifics regarding the number of simulated reads per dataset, please refer to Supplementary Table 2. 
+To assess the accuracy of Aspergillus classification and determine the Limit of Significant detection (LoSD), we simulated Illumina reads resembling cell-free DNA (cfDNA) from fungal genomes sourced from the NCBI RefSeq. This process generated a total of 87 simulated datasets, comprising 54 *Aspergillus* genomes, 7 *Penicillium* genomes, and 25 genomes from other pathogenic fungi. For specifics regarding the number of simulated reads per dataset, please refer to Supplementary Table 2. 
 
-Instructions and code for executing these simulations are outlined below. Simulated files can be found here: **XXX**
+To create realistic error profile of sequencing reads, the unprocessed ss-cfDNA sequencing reads from plasma of patient A02 (i.e. A02Pasp) sequenced with Illumina Novaseq 6000 2x 150bp were mapped to the GRCh38.p14 reference genome using Bowtie2 (-X 2000) alignment software. 
 
+Instructions and code for executing these simulations are outlined below. Simulated files can be found here: 
+**XXX**
+
+# Instructions
 Generate tab separated *input_sequencing_files.txt* file. 
 First column contains path to folder containing raw paired-end sequencing data. Raw files should be named "*R1*.fastq.gz" and "*R2*.fastq.gz"
-Second column contains sample_name (e.g. sample1)
+Second column contains sample_name (e.g. sampleX)
 Third column containd UDI (e.g. UDI01)
 
 ```bash
 ##prepare for simulations
-PATH_HumanGenome=/home/user/human_genome #path to human genome (without .fna or .fa); make sure the human genome is indexed using bowtie2-build
-SEED_NR=1 #set seed; for example 1 
+#path to human genome (without .fna or .fa); make sure the human genome is indexed using bowtie2-build
+PATH_HumanGenome=/home/user/human_genome
+#set seed; for example 1 
+SEED_NR=1 
 
 ##start ReSeq simulation
 cd ./scripts
