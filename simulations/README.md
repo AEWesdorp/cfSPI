@@ -5,7 +5,7 @@ To assess the accuracy of Aspergillus classification and determine the Limit of 
 Instructions for executing these simulations are outlined below. Simulated files can be found here *./sim_data/*
 
 # Instructions
-Generate tab separated *input_sequencing_files.txt* file. 
+Generate tab separated *./scripts/input_sequencing_files.txt* file. 
 First column contains path to folder containing raw paired-end sequencing data. Raw files should be named "*R1*.fastq.gz" and "*R2*.fastq.gz"
 Second column contains *sample_name* (e.g. sampleX)
 Third column containd *UDI* (e.g. UDI01)
