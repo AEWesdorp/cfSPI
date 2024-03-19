@@ -7,8 +7,8 @@ Within this directory, you will find nine databases discussed in our manuscript:
 - **EPRSc2** also known as **cRE.21**; 
 - **EPRSFv46** also known as **uRE.21**; 
 - **EPRSFv46DM** also known as **dRE.21**; 
-- **EPRSFv64DM** also kown as **uRE.31**; 
-- **EPRSFv64** also known as **dRE.31**; 
+- **EPRSFv64DM** also kown as **dRE.31**; 
+- **EPRSFv64** also known as **uRE.31**; 
 - **EPRSFv46MCAspDM** also known as **dREM.258**; 
 - **EPRSFv64MCAspDM** also known as **dREM.260**; 
 
