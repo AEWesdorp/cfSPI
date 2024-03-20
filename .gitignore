@@ -1,0 +1,3 @@
+./cfspi_output/* #output cfspi
+#./simulations/sim_data/ReSeq_simulation
+#./databases/*/*
