@@ -2,7 +2,7 @@
 
 To assess the accuracy of Aspergillus classification and determine the Limit of Significant detection (LoSD), we simulated Illumina reads resembling cell-free DNA (cfDNA) from fungal genomes sourced from the NCBI RefSeq. This process generated a total of 87 simulated datasets, comprising 54 *Aspergillus* genomes, 7 *Penicillium* genomes, and 25 genomes from other pathogenic fungi. To create realistic error profile of sequencing reads, the unprocessed ss-cfDNA sequencing reads from plasma of patient *A02* (i.e. *A02Pasp*) sequenced with Illumina Novaseq 6000 2x 150bp were mapped to the *GRCh38.p14* reference genome using Bowtie2 (-X 2000) alignment software. For specifics regarding the number of simulated reads per dataset, please refer to Supplementary Table 2. 
 
-Instructions for executing these simulations are outlined below. Simulated files can be found here *./sim_data/*
+Instructions for executing these simulations are outlined below. Simulated files can be found here: ***XXX***
 
 ## Instructions
 Generate tab separated *./scripts/input_sequencing_files.txt* file. 
