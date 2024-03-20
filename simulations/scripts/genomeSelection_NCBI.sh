@@ -4,9 +4,7 @@
 mkdir -p ../sim_data/
 mkdir -p ../sim_data/genomes_NCBI/
 
-wget ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/assembly_summary_genbank.txt -O ../sim_data/assembly_summary_genbank.txt
 wget ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt -O ../sim_data/assembly_summary_refseq.txt
-wget ftp.ncbi.nlm.nih.gov/genomes/genbank/sim_data/assembly_summary.txt -O ../sim_data/assembly_summary.txt
 
 grep -e "Penicillium" -e "Aspergillus" -e "Komagataella phaffii" -e "Mucor" -e "Rhizopus" -e "Pneumocystis" -e "Fusarium" -e "Botrytis cinerea" ../sim_data/assembly_summary_refseq.txt | \
 grep -v "virus" | cut -f 8 | sort | \
