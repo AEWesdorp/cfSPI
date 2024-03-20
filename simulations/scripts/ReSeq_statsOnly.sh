@@ -12,7 +12,6 @@ do
 	name=$(echo $line | awk '{print $2}')
 	echo $name
 	
-	### GET RESEQ STATS ###
  	mkdir -p ../sim_data/
 	mkdir -p ../sim_data/ReSeq_statsOnly/
 	mkdir -p ../sim_data/ReSeq_statsOnly/${name}/
