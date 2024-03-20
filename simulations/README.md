@@ -6,9 +6,9 @@ Instructions for executing these simulations are outlined below. Simulated files
 
 ## Instructions
 Generate tab separated *./scripts/input_sequencing_files.txt* file. 
-First column contains path to folder containing raw paired-end sequencing data. Raw files should be named "*R1*.fastq.gz" and "*R2*.fastq.gz"
-Second column contains *sample_name* (e.g. sampleX)
-Third column containd *UDI* (e.g. UDI01)
+First column contains path to folder containing raw paired-end sequencing data. Raw files should be named "*R1*.fastq.gz" and "*R2*.fastq.gz".
+Second column contains *sample_name* (e.g. sampleX).
+Third column containd *UDI* (e.g. UDI01).
 
 ```bash
 ##prepare for simulations
