@@ -29,6 +29,4 @@ sh ./genomeSelection_NCBI.sh
 #simulate microbial reads from NCBI refseq genomes
 sh ./ReSeq_simulation_NCBI.sh $SEED_NR
 
-#generate units files for Snakemake pipeline
-sh ./ReSeq_simulation_NCBI_createUnits.sh $PATH_HumanGenome $SEED_NR
 ```
