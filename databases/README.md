@@ -1,6 +1,6 @@
 ### Databases 
 
-Kraken2 for classification depends on a hash-table database. In **XXX** we sought to identify the most suitable database for the purpose of screening for potential pathogenic *Aspergillus*. The nine databases we created are available through ***XXX***. Hence, it is crucial that:
+Kraken2 for classification depends on a hash-table database. In **XXX** we sought to identify the most suitable database for the purpose of screening for potential pathogenic *Aspergillus*. The nine hash-table databases we created are available through ***XXX***. Hence, it is crucial to mention that:
 - The **RS** also known as **uR.7**; 
 - **EPRSc2** also known as **cRE.21**; 
 - **EPRSFv46** also known as **uRE.21**; 
