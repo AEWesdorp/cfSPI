@@ -10,9 +10,12 @@ while read specie; do
 	echo $specie
 	sp_dir="$(grep "$specie" ../sim_data/assembly_summary_refseq.txt | cut -d$'\t' -f 20  )"
 	sp_nm="$(echo $sp_dir | awk -F/ '{print $NF}')"
+
+ 	#download genomes 
 	wget "${sp_dir}/${sp_nm}_genomic.fna.gz" -O "../sim_data/genomes_NCBI/$(echo $specie | sed 's/ /_/g' )_genomic.fna.gz" 
 	gunzip --force "../sim_data/genomes_NCBI/$(echo $specie | sed 's/ /_/g' )_genomic.fna.gz" 
 
+	#simulation per sample 
 	for name in $(ls ../sim_data/ReSeq_statsOnly/ | head -n 1); do #only simulate based on one sample
 		mkdir -p ../sim_data/ReSeq_simulation/${name}/
 		#for seed_nr in seed; do 
