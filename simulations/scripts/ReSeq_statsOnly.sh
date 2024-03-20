@@ -36,4 +36,4 @@ do
 	reseq illuminaPE -j 32 -r "${HumanGenome}.fna" \
 	-b ../sim_data/ReSeq_statsOnly/${name}/${name}.bam --statsOnly --noTiles
 	
-done < ./input_sequencing_files.txt
+done < ./sim_data/input_sequencing_files.txt
