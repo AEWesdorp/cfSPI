@@ -2,7 +2,6 @@
 ### SELECT FUNGAL NCBI GENOMES FOR SIMULATION ###
 
 mkdir -p ./sim_data/
-mkdir -p ./sim_data/genomes_NCBI/
 
 wget ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt -O ./sim_data/assembly_summary_refseq.txt
 
