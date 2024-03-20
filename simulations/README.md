@@ -13,7 +13,7 @@ Third column containd *UDI* (e.g. UDI01)
 ```bash
 ##prepare for simulations
 #path to human genome *GRCh38.p14* (without .fna or .fa); make sure the human genome is indexed using bowtie2-build
-PATH_HumanGenome=/home/user/human_genome
+PATH_HumanGenome=/home/user/GRCh38.p14
 #set seed; for example 1 
 SEED_NR=1 
 
