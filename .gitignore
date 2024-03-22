@@ -1,5 +1,8 @@
-./cfspi_output/* #output cfspi
+./cfspi_output/* #output cfspi-pipeline
+./cfspi_input/* #input cfspi-pipeline
+./databases/hash_tables/* #hash_tables
 ./simulations/sim_data/ReSeq_simulation/sample1/
+./cfspi/config/*
 
 #./simulations/sim_data/ReSeq_simulation
 #./databases/*/*
