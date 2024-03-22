@@ -1,8 +1,9 @@
-./cfspi_output/* #output cfspi-pipeline
-./cfspi_input/* #input cfspi-pipeline
-./databases/hash_tables/* #hash_tables
-./simulations/sim_data/ReSeq_simulation/sample1/
-./cfspi/config/*
+cfspi_output/* #output cfspi-pipeline
+cfspi_input/* #input cfspi-pipeline
+databases/hash_tables/* #hash_tables
+simulations/sim_data/ReSeq_simulation/sample1/
+cfspi/config/*
+mapAspergillus/resources/EPRSc2_Aspergillus/*
 
 #./simulations/sim_data/ReSeq_simulation
 #./databases/*/*
