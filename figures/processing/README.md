@@ -2,12 +2,12 @@
 
 In this directory, we conduct preprocessing, such as handling the output of the cfSPI, to prepare the data for figure creation.
 
-- *DB_stats.ipynb*: This notebook provides statistics on the kraken2 hash-table databases. The resulting Rdata files can be found here `../../output/preprocessing/DBstats/`
-- *samples.DBs_thresholds.ipynb*: This notebook processes the sample output of the cfSPI pipeline. The resulting Rdata files can be found here `../../output/preprocessing/samples/`
-- *simulations.DBs_thresholds.ipynb*: This notebook processes the simulation output of the cfSPI pipeline. The resulting Rdata files can be found here `../../output/preprocessing/simulations/`
-- *calculations_LOSD_species.ipynb*: In this notebook, we compute the LoSD (Limit of Detection) in MPM (Mapped Per Million) at the species level. The resulting Rdata files can be found here `../../output/preprocessing/LoSD/`
-- *calculations_LOSD_genus.ipynb*: This notebook computes the LoSD in MPM at the genus level. The resulting Rdata files can be found here `../../output/preprocessing/LoSD/`
-- `calculations.Proof_of_principle.ipynb*: Here, we calculate the mean Fisher's tests. The resulting Rdata files can be found here `../../output/preprocessing/samples/`
+- `DB_stats.ipynb`: This notebook provides statistics on the kraken2 hash-table databases. The resulting Rdata files can be found here `../../output/preprocessing/DBstats/`
+- `samples.DBs_thresholds.ipynb`: This notebook processes the sample output of the cfSPI pipeline. The resulting Rdata files can be found here `../../output/preprocessing/samples/`
+- `simulations.DBs_thresholds.ipynb`: This notebook processes the simulation output of the cfSPI pipeline. The resulting Rdata files can be found here `../../output/preprocessing/simulations/`
+- `calculations_LOSD_species.ipynb`: In this notebook, we compute the LoSD (Limit of Detection) in MPM (Mapped Per Million) at the species level. The resulting Rdata files can be found here `../../output/preprocessing/LoSD/`
+- `calculations_LOSD_genus.ipynb`: This notebook computes the LoSD in MPM at the genus level. The resulting Rdata files can be found here `../../output/preprocessing/LoSD/`
+- `calculations.Proof_of_principle.ipynb`: Here, we calculate the mean Fisher's tests. The resulting Rdata files can be found here `../../output/preprocessing/samples/`
 
 #### Required
 - R 4.2.0
