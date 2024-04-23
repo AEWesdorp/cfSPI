@@ -4,6 +4,8 @@ databases/hash_tables/* #hash_tables
 simulations/sim_data/ReSeq_simulation/sample1/
 cfspi/config/*
 mapAspergillus/resources/EPRSc2_Aspergillus*
+figures/Suppl_Figures/.ipynb_checkpoints*
+figures/Figures/.ipynb_checkpoints*
 
 #./simulations/sim_data/ReSeq_simulation
 #./databases/*/*
