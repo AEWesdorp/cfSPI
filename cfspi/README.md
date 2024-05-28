@@ -17,6 +17,6 @@ An example samplesheet can be found at `config/samples.txt` and an example confi
 
 More information See [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles) and page [snakemake slurm](https://snakemake.readthedocs.io/en/stable/executing/cluster.html#executing-on-slurm-clusters). 
 
-# Trouble shooting
+## Trouble shooting
 - Input fasta folder always should contains following files to start with `*R1*.fastq.gz, *R2*.fastq.gz`
 - The current pipeline version includes adapter sequence information utilized by the SRSLY Claret Kit, the KAPA Kit, and 384 IDT UMI's. If another library preparation method is employed, kindly update the `config/config_samples.yaml` file and append the adapter index sequences to the `resources/adapter_indexes/` directory."
