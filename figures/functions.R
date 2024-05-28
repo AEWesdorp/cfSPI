@@ -1,0 +1,23 @@
+## -----------------------------------------------------------------------------
+lapply(c("dplyr", 
+         "colorspace",
+         "khroma",
+         "ggplot2", 
+         "ggpattern",
+         "reshape2", 
+         "tidyverse", 
+         "stringr",
+         "patchwork", 
+         "Hmisc", 
+         "rstatix",
+         "readr",
+         "Rsamtools",
+         "seqinr",
+         "ggpubr", 
+         "ggbreak",
+         "gghighlight", 
+         "ggnewscale", 
+         "ggh4x",
+         "gplots"
+        ), 
+       require, character.only = TRUE)

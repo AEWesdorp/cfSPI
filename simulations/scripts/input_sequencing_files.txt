@@ -1,1 +1,1 @@
-/home/user/data/A01Pasp/	sample1	UDI02
+/path/to/data/A01Pasp/	sample1	UDI02

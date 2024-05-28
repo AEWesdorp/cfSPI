@@ -4,7 +4,15 @@ To assess the accuracy of *Aspergillus* classification and determine the Limit o
 
 Instructions for executing these simulations are outlined below. Simulated files can be found here: ***XXX***
 
-## Instruction generation simulated cfDNA Illumina datasets
+#### Required
+- bbmap		38.22
+- bracken	2.8
+- bowtie2 	2.5.0
+- kraken2 	2.1.2
+- reseq		1.1
+- samtools	1.6
+
+#### Instruction generation simulated cfDNA Illumina datasets
 Generate tab separated *./scripts/input_sequencing_files.txt* file. 
 First column contains path to folder containing raw paired-end sequencing data. Raw files should be named "*R1*.fastq.gz" and "*R2*.fastq.gz".
 Second column contains *sample_name* (e.g. sampleX).
