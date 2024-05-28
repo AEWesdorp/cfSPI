@@ -1,7 +1,7 @@
 ## snakemake parameters
-units: ./config/config_problem.txt
-run_name: FINAL_chm13v2GRCh38p14/
-outdir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/ssdna-snakemake
+units: ./config/samples.txt
+run_name: example_name_output_folder/
+outdir: /example/name/output/directory/
 
 # AdapterRemoval
 adapter_removal:
@@ -12,31 +12,11 @@ adapter_removal:
 k_mer_length: 35
 
 database:
-        #- RS
-  #- EPRS_miss2gen
-  #- EPRSFv46
-  #- EPRSFv46DM
-  #- EPRSFv46MCAspDM
-  #- EPRSFv64
-  #- EPRSFv64DM
-  #- EPRSFv64MCAspDM
-  #- RS_minusT2T
 - EPRSc2
-  #- EPRSd2
-  #- EPRSFv64MCaspDM
-  #- EPRSFv44MCaspDM
-  #- EPRSFv46MCDM
-  #- EPRSFv64MCDM
 
-db_dir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/make_database/
+db_dir: /example/database/directory/
 
-k2_threshold: [0.4] #[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-
-fungal_dir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/github_cfspi/cfspi/resources/mapping/fungal/
-fungal_taxids:
-- 5061 #Aspergillus niger 
-  #- 746128 #Aspergillus fumigatus Aspergillus fumigatus Af293
-  #- 330879 #Aspergillus fumigatus Aspergillus fumigatus Af293
+k2_threshold: [0.4] #if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 # adapters
 # https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
