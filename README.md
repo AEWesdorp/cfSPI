@@ -21,19 +21,19 @@ You can find analysis pipelines and scripts for generating figures related to th
 ## Repository Content
 The various parts of the analyses are organized into different folders within the main directory. Each folder contains a ` README.md`  file with specific details relevant to the analyses conducted/information provided within that folder.
 
-### cfSPI-pipeline
+#### cfSPI-pipeline
 Details on the pipeline, which processes paired-end Illumina sequencing data to identify pathogenic species, optimized for detecting *Aspergillus* species: [cfSPI](https://github.com/AEWesdorp/cfSPI/tree/main/cfspi).
 
-### databases
+#### databases
 General information on the nine hash-table databases created for this project: [databases](https://github.com/AEWesdorp/cfSPI/tree/main/databases).
 
-### figures
+#### figures
 Details on data processing and figure generation: [figures](https://github.com/AEWesdorp/cfSPI/tree/main/figures).
 
-### mapAspergillus
+#### mapAspergillus
 Details on the alignment of *A. fumigatus* classified reads to diverse *Aspergillus* genomes for quality assurance: [mapAspergillus](https://github.com/AEWesdorp/cfSPI/tree/main/mapAspergillus).
 
-### simulations
+#### simulations
 Details on simulating Illumina reads resembling cell-free DNA (cfDNA) from fungal genomes sourced from the NCBI RefSeq: [simulations](https://github.com/AEWesdorp/cfSPI/tree/main/simulations).
 
 ## Installation
