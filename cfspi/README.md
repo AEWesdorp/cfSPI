@@ -1,22 +1,78 @@
 # cfSPI-pipeline
 This repository contains the **cfDNA Single-strand Pathogen Identification (cfSPI) pipeline**, an open-source data analysis Snakemake workflow designed for detecting pathogenic microbial species. The cfSPI pipeline processes paired-end Illumina sequencing data and has been optimized for detecting *Aspergillus* species.
+
 In short, duplicates were removed (using nubeam), after which high-quality sequencing data was generated (using fastp) by default removal of low quality reads and usage of a low complexity filter as well as by adapter removal and removal of short (<35bp) reads (using AdapterRemoval). After subtraction of host sequences by mapping to the human reference genome using Bowtie2, the remaining paired-end reads were taxonomically classified using kraken2.
 
-## Install snakemake in a new/clean conda environment
-Install snakemake in your environment (installation suggestion see snakemake website: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+## Getting started
+To use the cfSPI-pipeline, follow these steps: 
+
+#### Prerequisites
+1. Ensure you have either `conda` or `mamba` installed on your system.
+
+#### Installation
+1. Clone the GitHub Repository:
+    ```bash
+    git clone https://github.com/AEWesdorp/cfSPI/cfspi.git
+    ```
+2. Install Snakemake:
+   follow the installation instructions on the [Snakemake website](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+3. Create and Activate a Conda Environment:
+    ```bash
+    # Create a new empty environment called "cfspi_env"
+    conda create --name cfspi_env
+    # Activate the environment "cfspi_env"
+    conda activate cfspi_env
+    ```
+4. Install Snakemake:
+    ```bash
+    # Install snakemake from the Bioconda channel (conda-forge contains dependencies)
+    mamba install -c conda-forge -c bioconda cfspi_env
+    ```
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
-An example samplesheet can be found at `config/samples.txt` and an example configfil at `config/config_samples.yaml`. Within `config/config_samples.yaml`, ensure to specify the `run_name`, `outdir` and `db_dir`. 
+An example samplesheet can be found at **`config/samples.txt`** and an example configfil at **`config/config_samples.yaml`**. 
+
+In **`config/samples.txt`**, ensure to specify the following: 
+- *units*: Specify name of your sample.
+- *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
+- *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
+- *UDI*: Set the UDI of the sample.
+- *path_to_R1_R2*: Provide the directory path where raw sequencing files are stored (path to `*R1*.fastq.gz`, `*R2*.fastq.gz`) 
+  
+In **`config/config_samples.yaml`**, ensure to specify the following:
+
+General Settings:
+- *units*: Specify name of the samplesheet (for example, `config/samples.txt`). 
+- *run_name*: Set a unique name for the run.
+- *outdir*: Specify the output directory where results will be stored.
+
+Reference Genome Settings:
+- *reference_genome*: Indicate the reference genome to be used.
+- *reference_genome_dir*: Provide the directory path where the reference genome is stored.
+
+Kraken2 Classification Settings:
+- *database*: Specify the database used for Kraken2 classification.
+- *database_dir*: Define the directory path where the Kraken2 database is located.
+- *k2_threshold*: Set the threshold value for Kraken2 classification.
 
 ## Running the pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
 1. Start a screen session. 
 2. Request an interactive node for submitting jobs (long enough for all jobs to finish, e.g. 48 hours), with 16G mem, 2 cores.
-3. While running snakemake, simply run command:
-`snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --profile ./profile/slurm --conda-frontend conda --use-conda `. (Resources defined in each rule will be used. If not defined, default resources defined in the `profile/slurm/config.yaml` will be used. )
+3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
+4. Activate your conda environmen.
+      ```bash
+    # Activate the environment "cfspi_env"
+    conda activate cfspi_env
+    ```
+6. Activate the conda environment in which you have snakemake innstalled, to then run:
+   ```bash
+   snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --profile ./profile/slurm --conda-frontend conda --use-conda
+   ```
+   (Resources defined in each rule will be used. If not defined, default resources defined in the `profile/slurm/config.yaml` will be used.)
 
 More information See [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles) and page [snakemake slurm](https://snakemake.readthedocs.io/en/stable/executing/cluster.html#executing-on-slurm-clusters). 
 
 ## Trouble shooting
 - Input fasta folder always should contains following files to start with `*R1*.fastq.gz, *R2*.fastq.gz`
-- The current pipeline version includes adapter sequence information utilized by the SRSLY Claret Kit, the KAPA Kit, and 384 IDT UMI's. If another library preparation method is employed, kindly update the `config/config_samples.yaml` file and append the adapter index sequences to the `resources/adapter_indexes/` directory."
+- The current pipeline version includes adapter sequence information utilized by the SRSLY Claret Kit, the KAPA Kit, and 384 IDT UMI's. If another library preparation method is employed, kindly update the `workflow/rules/trim.smk` file and append the adapter index sequences to the `resources/adapter_indexes/` directory.
