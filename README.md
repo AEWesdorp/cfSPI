@@ -2,7 +2,7 @@
 
 cfSPI is a cfDNA Single-strand Pathogen Identification workflow, designed for paired-end Illumina sequencing data. This repository is associated with the publication: "NGS-based *Aspergillus* detection in plasma and lung lavage of children with invasive pulmonary aspergillosis."
 
-For details on the pipeline, see: [cfSPI](https://github.com/AEWesdorp/cfSPI/tree/main/cfspi).
+For details on the Snakemake pipeline, used for the processing of paired-end Illumina sequencing data see: [cfSPI](https://github.com/AEWesdorp/cfSPI/tree/main/cfspi).
 
 ## Table of Contents
 1. [Introduction](#introduction)
