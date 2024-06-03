@@ -1,8 +1,8 @@
 ############################################ PLEASE MODIFY ############################################
 ## snakemake parameters
-units: config/.samples_head.txt
-run_name: test_Snakemake_IFD/
-outdir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/ssdna-snakemake
+units: ./config/samples.txt
+run_name: example_name_output_folder/
+outdir: /example/name/output/directory/
 
 # AdapterRemoval
 adapter_removal:
@@ -17,10 +17,10 @@ reference_genome_dir: ./resources/mapping/host/
 
 database:
 - EPRSc2
-database_dir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/make_database/
 
-k2_threshold: [0.4] #[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+db_dir: /example/database/directory/
 
+k2_threshold: [0.4] #if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 ############################################ DO NOT MODIFY ############################################
 # adapters
