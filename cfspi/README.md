@@ -19,14 +19,9 @@ To use the cfSPI-pipeline, follow these steps:
 3. Create and Activate a Conda Environment:
     ```bash
     # Create a new empty environment called "cfspi_env"
-    conda create --name cfspi_env
+    conda create -c conda-forge -c bioconda -n cfspi_env snakemake
     # Activate the environment "cfspi_env"
     conda activate cfspi_env
-    ```
-4. Install Snakemake:
-    ```bash
-    # Install snakemake from the Bioconda channel (conda-forge contains dependencies)
-    mamba install -c conda-forge -c bioconda cfspi_env
     ```
     
 ## Create a combined indexed version of the human reference genome 
@@ -66,16 +61,30 @@ Kraken2 Classification Settings:
 - *database_dir*: Define the directory path where the Kraken2 database is located.
 - *k2_threshold*: Set the threshold value for Kraken2 classification.
 
-## Running the pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
+## Running the cfspi-pipeline 
 1. Start a screen session. 
-2. Request an interactive node for submitting jobs (long enough for all jobs to finish, e.g. 48 hours), with 16G mem, 2 cores.
+2. Request an interactive node for for running the jobs (long enough to finish all jobs of one liquid biopsy sample, e.g. 24 hours), with 450G mem, 16 cores. 
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
-4. Activate your conda environmen.
+4. Activate your conda environment.
       ```bash
     # Activate the environment "cfspi_env"
     conda activate cfspi_env
     ```
-6. Activate the conda environment in which you have snakemake innstalled, to then run:
+5. Run the snakemake pipeline.
+   ```bash
+   snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --cores all --conda-frontend conda --use-conda
+   ```
+
+## Running the cfi-pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
+1. Start a screen session. 
+2. Request an interactive node for submitting jobs (long enough for all jobs to finish, e.g. 48 hours), with 16G mem, 2 cores.
+3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
+4. Activate your conda environment.
+    ```bash
+    # Activate the environment "cfspi_env"
+    conda activate cfspi_env
+    ```
+5. Run the snakemake pipeline.
    ```bash
    snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --profile ./profile/slurm --conda-frontend conda --use-conda
    ```
