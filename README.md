@@ -14,7 +14,7 @@ For details on the Snakemake pipeline, used for the processing of paired-end Ill
 
 ## Introduction
 
-cfSPI is a cfDNA Single-strand Pathogen Identification workflow, designed for paired-end Illumina sequencing data. This repository was created by Emmy Wesdorp from [De Ridder lab](https://www.deridderlab.nl/) at the Center of Molecular Medicine, University Medical Center Utrecht, the Netherlands.
+cfSPI is a cfDNA Single-strand Pathogen Identification workflow, designed for paired-end Illumina sequencing data. This repository was created by Emmy Wesdorp & Li-Ting Chen from [De Ridder lab](https://www.deridderlab.nl/) at the Center of Molecular Medicine, University Medical Center Utrecht, the Netherlands.
 
 You can find analysis pipelines and scripts for generating figures related to the paper: "NGS-based *Aspergillus* detection in plasma and lung lavage of children with invasive pulmonary aspergillosis."
 
