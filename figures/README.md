@@ -1,6 +1,6 @@
 # Figures manuscript repository
 This repository accompanies the figures featured in the publication titled: "NGS-based *Aspergillus* detection in plasma and lung lavage of children with invasive pulmonary aspergillosis."
-Figure generation was performed utilizing `R` version `4.2.0`.
+All data pre-processing and figure generation were performed utilizing `R` version `4.2.0`.
 
 #### R packages required
 - colorspace 2.1-0
