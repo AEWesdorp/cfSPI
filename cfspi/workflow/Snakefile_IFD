@@ -407,10 +407,3 @@ rule ff_grch38_mapping:
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};
         """
-
-onsuccess:
-    print("Workflow finished, no error")
-    shell("mail -s 'Job finished! Well done!' 'a.e.wesdorp@umcutrecht.nl' < {log}")
-onerror:
-    print("An error occurred")
-    shell("mail -s 'an error occurred' 'a.e.wesdorp@umcutrecht.nl' < {log}")
