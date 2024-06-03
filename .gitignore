@@ -1,14 +1,17 @@
-cfspi_output/* #output cfspi-pipeline
-cfspi_input/* #input cfspi-pipeline
-databases/hash_tables/* #hash_tables
-simulations/sim_data/ReSeq_simulation/sample1/
+databases/hash_tables/
+
+simulations/sim_data/
+
 cfspi/config/.samples.txt
 cfspi/.snakemake/*
+
 mapAspergillus/resources/EPRSc2_Aspergillus*
+
+figures/.ipynb_checkpoints/
+figures/ipynb_to_R.ipynb
 figures/Suppl_Figures/.ipynb_checkpoints*
 figures/Suppl_Figures/*.ipynb
 figures/Figures/.ipynb_checkpoints*
 figures/Figures/*.ipynb
 
-#./simulations/sim_data/ReSeq_simulation
-#./databases/*/*
+output/
