@@ -9,5 +9,6 @@ For quality assurance, we aligned the reads classified as *A. fumigatus* to all 
 
 #### Execute 
 ```bash
+unzip resources/EPRSc2_Aspergillus.zip
 sh scripts/mapping_Afumigatus_panAspergillusEPRSc2.sh
 ```
