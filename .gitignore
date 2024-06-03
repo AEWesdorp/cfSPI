@@ -2,7 +2,7 @@ databases/hash_tables/
 
 simulations/sim_data/
 
-cfspi/config/.samples.txt
+cfspi/config/.*
 cfspi/.snakemake/*
 
 mapAspergillus/resources/EPRSc2_Aspergillus*
