@@ -1,3 +1,3 @@
-sample_name	other_name	pathogen_type	condition	sample_type	input_material	library_prep	adapter_type	UDI	adapter_index_P7_R1	adapter_index_P5_R2	unit_name	ref_genome	path_to_R1_R2	notes
-A01Pasp		fungal	patient	plasma	cfdna	SRSLY	SRSLY_dual_index	UDI02			run1	./resources/mapping/host/chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic  /path/to/fastq_gz/A01Pasp/		
-A02Pasp		fungal	patient	plasma	cfdna	SRSLY	SRSLY_dual_index	UDI01			run1	./resources/mapping/host/chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic  /path/to/fastq_gz/A02Pasp/		
+sample_name	library_prep	adapter_type	UDI	path_to_R1_R2	notes
+A01Pasp	SRSLY	SRSLY_dual_index	UDI02	/path/to/fastq_gz/A01Pasp	
+A02Pasp	SRSLY	SRSLY_dual_index	UDI01	/path/to/fastq_gz/A01Pasp	
