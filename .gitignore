@@ -5,7 +5,7 @@ simulations/sim_data/
 cfspi/config/.*
 cfspi/.snakemake/*
 
-mapAspergillus/resources/EPRSc2_Aspergillus*
+mapAspergillus/resources/EPRSc2_Aspergillus/*
 
 figures/.ipynb_checkpoints/
 figures/ipynb_to_R.ipynb
