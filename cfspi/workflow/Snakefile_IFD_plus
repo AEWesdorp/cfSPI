@@ -480,10 +480,3 @@ rule g_kraken2:
         kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
-
-onsuccess:
-    print("Workflow finished, no error")
-    shell("mail -s 'Job finished! Well done!' 'a.e.wesdorp@umcutrecht.nl' < {log}")
-onerror:
-    print("An error occurred")
-    shell("mail -s 'an error occurred' 'a.e.wesdorp@umcutrecht.nl' < {log}")
