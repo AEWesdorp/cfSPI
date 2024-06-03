@@ -28,6 +28,16 @@ To use the cfSPI-pipeline, follow these steps:
     # Install snakemake from the Bioconda channel (conda-forge contains dependencies)
     mamba install -c conda-forge -c bioconda cfspi_env
     ```
+    
+## Create a combined indexed version of the human reference genome 
+To mitigate potential false positives arising from incomplete host read subtraction, we implemented a dual-mapping strategy using `bowtie2-2.5.1`. This involved aligning reads to a combined host genome version comprising GRCh38.p14 and CHM13v2.
+
+We obtained the GRCh38.p14 genome from the [NCBI RefSeq](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.40/) and the CHM13v2 genome via this [GitHub repository](https://github.com/marbl/CHM13). To index these genomes, we executed the following commands:
+```bash
+cat GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0.fa > chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
+bowtie-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
+```
+This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**, which should be referenced in the `config/samples.txt` file under the *reference_genome_dir* and *reference_genome* fields, respectively (see below).
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
