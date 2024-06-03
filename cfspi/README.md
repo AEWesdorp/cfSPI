@@ -7,7 +7,7 @@ In short, duplicates were removed (using nubeam), after which high-quality seque
 To use the cfSPI-pipeline, follow these steps: 
 
 #### Prerequisites
-1. Ensure you have either `conda` or `mamba` installed on your system.
+1. Ensure you have either `conda` installed on your system.
 
 #### Installation
 1. Clone the GitHub Repository:
