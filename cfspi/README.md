@@ -61,7 +61,7 @@ Kraken2 Classification Settings:
 - *database_dir*: Define the directory path where the Kraken2 database is located.
 - *k2_threshold*: Set the threshold value for Kraken2 classification.
 
-## Running the cfspi-pipeline 
+## Running the cfspi-pipeline on an interactive node
 1. Start a screen session. 
 2. Request an interactive node for for running the jobs (long enough to finish all jobs of one liquid biopsy sample, e.g. 24 hours), with 450G mem, 16 cores. 
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
