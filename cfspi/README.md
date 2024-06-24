@@ -12,7 +12,7 @@ To use the cfSPI-pipeline, follow these steps:
 #### Installation
 1. Clone the GitHub Repository:
     ```bash
-    git clone https://github.com/AEWesdorp/cfSPI/cfspi.git
+    git clone https://github.com/AEWesdorp/cfSPI.git
     ```
 2. Install Snakemake:
    follow the installation instructions on the [Snakemake website](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
@@ -39,7 +39,7 @@ Create a samplesheet and a configfile in folder `configs/` accordingly.
 An example samplesheet can be found at **`config/samples.txt`** and an example configfil at **`config/config_samples.yaml`**. 
 
 In **`config/samples.txt`**, ensure to specify the following: 
-- *units*: Specify name of your sample.
+- *sample_name*: Specify name of your sample.
 - *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
 - *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
 - *UDI*: Set the UDI of the sample.
