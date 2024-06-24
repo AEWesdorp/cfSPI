@@ -75,7 +75,7 @@ Kraken2 Classification Settings:
    snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --cores all --conda-frontend conda --use-conda
    ```
 
-## Running the cfi-pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
+## Running the cfspi-pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
 1. Start a screen session. 
 2. Request an interactive node for submitting jobs (long enough for all jobs to finish, e.g. 48 hours), with 16G mem, 2 cores.
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
