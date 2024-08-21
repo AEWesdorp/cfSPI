@@ -1,6 +1,6 @@
 ############################################ PLEASE MODIFY ############################################
 ## snakemake parameters
-units: ./config/samples.txt
+units: ./config/samples.tsv
 run_name: example_name_output_folder/
 outdir: /example/name/output/directory
 
