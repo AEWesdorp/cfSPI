@@ -438,13 +438,19 @@ rule fff_kraken2_standardDB:
     threads: 16
     shell:
         """
-        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_chm13_grch38_out} --report {output.k2_chm13_grch38_rep} --paired {input.R1_chm13_grch38} {input.R2_chm13_grch38} ; 
+        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} \
+	--report-zero-counts --report-minimizer-data \
+	--output {output.k2_chm13_grch38_out} --report {output.k2_chm13_grch38_rep} --paired {input.R1_chm13_grch38} {input.R2_chm13_grch38} ; 
         grep -v "^U"  {output.k2_chm13_grch38_out} > {output.k2_chm13_grch38_clf};
 
-        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_chm13_out} --report {output.k2_chm13_rep} --paired {input.R1_chm13} {input.R2_chm13} ; 
+        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} \
+	--report-zero-counts --report-minimizer-data \
+	--output {output.k2_chm13_out} --report {output.k2_chm13_rep} --paired {input.R1_chm13} {input.R2_chm13} ; 
         grep -v "^U"  {output.k2_chm13_out} > {output.k2_chm13_clf};
 
-        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_grch38_out} --report {output.k2_grch38_rep} --paired {input.R1_grch38} {input.R2_grch38} ; 
+        kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} \
+	--report-zero-counts --report-minimizer-data \
+	--output {output.k2_grch38_out} --report {output.k2_grch38_rep} --paired {input.R1_grch38} {input.R2_grch38} ; 
         grep -v "^U"  {output.k2_grch38_out} > {output.k2_grch38_clf};
         """
 
@@ -474,6 +480,8 @@ rule g_kraken2:
         "envs/kraken.yaml"
     shell:
         """
-        kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
+        kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} \
+	--report-zero-counts --report-minimizer-data \
+	--output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
