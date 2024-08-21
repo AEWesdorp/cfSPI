@@ -15,8 +15,7 @@ k_mer_length: 35
 reference_genome: chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
 reference_genome_dir: /example/name/host_genome/directory/
 
-database:
-- EPRSc2
+database: [EPRSc2]
 
 database_dir: /example/database/directory/
 
