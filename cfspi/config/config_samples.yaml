@@ -1,6 +1,6 @@
 ############################################ PLEASE MODIFY ############################################
 ## snakemake parameters
-units: config/.samples_head.txt
+units: config/.samples_head.tsv
 run_name: test_Snakemake_IFD/
 outdir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/ssdna-snakemake
 
