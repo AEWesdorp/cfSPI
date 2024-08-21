@@ -36,19 +36,6 @@ Details on the alignment of *A. fumigatus* classified reads to diverse *Aspergil
 #### simulations
 Details on simulating Illumina reads resembling cell-free DNA (cfDNA) from fungal genomes sourced from the NCBI RefSeq: [simulations](https://github.com/AEWesdorp/cfSPI/tree/main/simulations).
 
-## Installation
-
-To install cfSPI, follow these steps:
-
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/AEWesdorp/cfSPI.git
-    cd cfSPI
-    ```
-
-2. Install `snakemake` and `R` in your environment.
-3. Further dependencies are described in each folder in this repository separately.
-
 ## Usage
 A `README.md` file could be found in each folder concerning relevant analyses.
 
