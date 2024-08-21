@@ -2,7 +2,7 @@
 ## snakemake parameters
 units: ./config/samples.txt
 run_name: example_name_output_folder/
-outdir: /example/name/output/directory/
+outdir: /example/name/output/directory
 
 # AdapterRemoval
 adapter_removal:
