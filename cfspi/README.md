@@ -30,7 +30,7 @@ We obtained the GRCh38.p14 'Genome sequence (FASTA)' from the [NCBI RefSeq](http
 cat GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0.fa > chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
 bowtie2-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
 ```
-This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**, which should be referenced in the `./config/config_samples.yaml` file under the *reference_genome_dir* and *reference_genome* fields, respectively (see below).
+This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**.
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
