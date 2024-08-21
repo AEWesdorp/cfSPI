@@ -7,19 +7,17 @@ In short, duplicates were removed (using nubeam), after which high-quality seque
 To use the cfSPI-pipeline, follow these steps: 
 
 #### Prerequisites
-1. Ensure you have either `conda` installed on your system.
+1. Ensure you have `conda` installed on your system.
 
 #### Installation
 1. Clone the GitHub Repository:
     ```bash
     git clone https://github.com/AEWesdorp/cfSPI.git
     ```
-2. Install Snakemake:
-   follow the installation instructions on the [Snakemake website](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
-3. Create and Activate a Conda Environment:
+2. Create and Activate a Conda Environment:
     ```bash
     # Create a new empty environment called "cfspi_env"
-    conda create -c conda-forge -c bioconda -n cfspi_env snakemake
+    conda create -c conda-forge -c bioconda -n cfspi_env snakemake bowtie2
     # Activate the environment "cfspi_env"
     conda activate cfspi_env
     ```
@@ -27,10 +25,10 @@ To use the cfSPI-pipeline, follow these steps:
 ## Create a combined indexed version of the human reference genome 
 To mitigate potential false positives arising from incomplete host read subtraction, we implemented a dual-mapping strategy using `bowtie2-2.5.1`. This involved aligning reads to a combined host genome version comprising GRCh38.p14 and CHM13v2.
 
-We obtained the GRCh38.p14 genome from the [NCBI RefSeq](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.40/) and the CHM13v2 genome via this [GitHub repository](https://github.com/marbl/CHM13). To index these genomes, we executed the following commands:
+We obtained the GRCh38.p14 'Genome sequence (FASTA)' from the [NCBI RefSeq](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.40/) and the CHM13v2 genome via this [GitHub repository](https://github.com/marbl/CHM13). To index these genomes, we executed the following commands:
 ```bash
 cat GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0.fa > chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
-bowtie-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
+bowtie2-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
 ```
 This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**, which should be referenced in the `config/samples.txt` file under the *reference_genome_dir* and *reference_genome* fields, respectively (see below).
 
