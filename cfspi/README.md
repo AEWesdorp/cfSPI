@@ -32,6 +32,12 @@ bowtie2-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_P
 ```
 This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**.
 
+Note: If you plan to use the `Snakemake_IFD_plus` or are specifically interested in mapping to either `chm13v2.0.fa` or `GCF_000001405.40_GRCh38.p14_genomic.fna` using the default `Snakemake_IFD` pipeline, you can index these reference genomes with the following commands:
+```bash
+bowtie2-build chm13v2.0.fa chm13v2.0
+bowtie2-build GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic
+```
+
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
 An example samplesheet can be found at **`./config/samples.tsv`** and an example configfile at **`./config/config_samples.yaml`**. 
@@ -52,8 +58,8 @@ General Settings:
 
 Reference Genome Settings:
 - *reference_genome*: Indicate the reference genome to be used. We recommend using the dual-genome `chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`
-- *reference_genome_dir*: Please provide the absolute path to the directory where the reference genome is stored.
-
+- *reference_genome_dir*: Please provide the absolute path to the directory where the reference genome(s) are stored.
+  
 Kraken2 Classification Settings:
 - *database*: Specify the name of the database(s) to be used for kraken2 classification. Each *database* name should correspond to a directory within the *database_dir*. the *database* folder should be containing all necessary database files (e.g., `hash.k2d`, `opts.k2d`, `taxo.k2d`). Please note that the database(s) are not included in this GitHub repository.
 - *database_dir*: Provide the absolute path to the directory where the kraken2 database(s) are located.
@@ -65,7 +71,6 @@ Kraken2 Classification Settings:
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
 4. Activate your conda environment.
       ```bash
-    # Activate the environment "cfspi_env"
     conda activate cfspi_env
     ```
 5. Run the snakemake pipeline.
@@ -90,5 +95,5 @@ Kraken2 Classification Settings:
 More information See [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles) and page [snakemake slurm](https://snakemake.readthedocs.io/en/stable/executing/cluster.html#executing-on-slurm-clusters). 
 
 ## Trouble shooting
-- Input fasta folder always should contains following files to start with `*R1*.fastq.gz, *R2*.fastq.gz`
+- Input fasta folder always should contains following files to start with `*_R1_*.fastq.gz, *_R2_*.fastq.gz`
 - The current pipeline version includes adapter sequence information utilized by the SRSLY Claret Kit, the KAPA Kit, and 384 IDT UMI's. If another library preparation method is employed, kindly update the `workflow/rules/trim.smk` file and append the adapter index sequences to the `resources/adapter_indexes/` directory.
