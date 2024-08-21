@@ -107,9 +107,9 @@ rule a_concat_fastq:
         R1_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R1.fastq.gz')),
         R2_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R2.fastq.gz')),
 
-        done=touch(opj(OUTDIR,"done/a_concat_fastq/{sample_name}.done")),
+        done=touch(opj(OUTDIR, "done/a_concat_fastq/{sample_name}.done")),
     benchmark:
-        opj(OUTDIR,"benchmark/a_concat_fastq/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/a_concat_fastq/{sample_name}.tsv"),
     group:
         "QC"
     resources:
@@ -140,10 +140,10 @@ rule b_unique_nubeam:
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
 
-        done=touch(opj(OUTDIR,"done/b_unique_nubeam/{sample_name}.done")),
+        done=touch(opj(OUTDIR, "done/b_unique_nubeam/{sample_name}.done")),
     priority: 46
     benchmark:
-        opj(OUTDIR,"benchmark/b_unique_nubeam/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/b_unique_nubeam/{sample_name}.tsv"),
     group:
         "QC"
     resources:
@@ -152,7 +152,7 @@ rule b_unique_nubeam:
         cpus = 1, 
         disk_mb = 12000, 
     log:
-        log=opj(OUTDIR,"log/b_unique_nubeam/{sample_name}.log"),
+        log=opj(OUTDIR, "log/b_unique_nubeam/{sample_name}.log"),
     shell:
         """
         ./resources/nubeam-dedup -i1 {input.R1_raw} -i2 {input.R2_raw} -o1 {output.R1_nubeam} -o2 {output.R2_nubeam} -s 1 -r 0 2>&1 > {log.log};
@@ -166,17 +166,17 @@ rule c_fastp:
         R1_nubeam=rules.b_unique_nubeam.output.R1_nubeam,
         R2_nubeam=rules.b_unique_nubeam.output.R2_nubeam,
     output:
-        R1_trimmed=temp(opj(OUTDIR,"results/tmp/{sample_name}_R1_trimmed.fastq")),
-        R2_trimmed=temp(opj(OUTDIR,"results/tmp/{sample_name}_R2_trimmed.fastq")),
+        R1_trimmed=temp(opj(OUTDIR, "results/tmp/{sample_name}_R1_trimmed.fastq")),
+        R2_trimmed=temp(opj(OUTDIR, "results/tmp/{sample_name}_R2_trimmed.fastq")),
 
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
 
-        html=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.html"),
-        json=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.json"),
-        failed=temp(opj(OUTDIR,"results/tmp/fastp_{sample_name}.fastq")),
+        html=opj(OUTDIR, "reports/fastp/{sample_name}_fastp.html"),
+        json=opj(OUTDIR, "reports/fastp/{sample_name}_fastp.json"),
+        failed=temp(opj(OUTDIR, "results/tmp/fastp_{sample_name}.fastq")),
 
-        done=touch(opj(OUTDIR,"done/c_fastp/{sample_name}.done")),
+        done=touch(opj(OUTDIR, "done/c_fastp/{sample_name}.done")),
     group:
         "QC"
     priority: 47
@@ -186,10 +186,10 @@ rule c_fastp:
         cpus = 16, 
         disk_mb = 12000, 
     log:
-        log=opj(OUTDIR,"log/c_fastp/{sample_name}.log"),
+        log=opj(OUTDIR, "log/c_fastp/{sample_name}.log"),
     threads: 16
     benchmark:
-        opj(OUTDIR,"benchmark/c_fastp/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/c_fastp/{sample_name}.tsv"),
     conda:
         "envs/fastp.yaml"
     shell:
@@ -206,7 +206,7 @@ rule d_adapter_removal:
         R1_trimmed=rules.c_fastp.output.R1_trimmed,
         R2_trimmed=rules.c_fastp.output.R2_trimmed,
     output:
-        singleton=temp(opj(OUTDIR,"results/tmp/{sample_name}_singleton_trimmed_truncated")),
+        singleton=temp(opj(OUTDIR, "results/tmp/{sample_name}_singleton_trimmed_truncated")),
         R1_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq')),
         R2_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq')),
 
@@ -216,15 +216,15 @@ rule d_adapter_removal:
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_04_adapt_remov_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_04_adapt_remov_fastq.txt'),
 
-        settings=opj(OUTDIR,"reports/adapter_removal/{sample_name}_adapter_removal_settings.txt"),
-        discarded=temp(opj(OUTDIR,"results/tmp/{sample_name}_trimmed_discarded.fastq")),
-        done=touch(opj(OUTDIR,"done/d_adapter_removal/{sample_name}.done")),
+        settings=opj(OUTDIR, "reports/adapter_removal/{sample_name}_adapter_removal_settings.txt"),
+        discarded=temp(opj(OUTDIR, "results/tmp/{sample_name}_trimmed_discarded.fastq")),
+        done=touch(opj(OUTDIR, "done/d_adapter_removal/{sample_name}.done")),
 
     group:
         "QC"
     priority: 48
     log:
-        log=opj(OUTDIR,"log/d_adapter_removal/{sample_name}.log"),
+        log=opj(OUTDIR, "log/d_adapter_removal/{sample_name}.log"),
     params:
         mq = config['adapter_removal']['minquality'],
         tmns = config['adapter_removal']['trimns'],
@@ -241,7 +241,7 @@ rule d_adapter_removal:
     conda:
         "envs/adapter_removal.yaml"
     benchmark:
-        opj(OUTDIR,"benchmark/d_adapter_removal/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/d_adapter_removal/{sample_name}.tsv"),
     shell:
         """
         AdapterRemoval --threads {threads} --file1 {input.R1_trimmed} --file2 {input.R2_trimmed} --basename {params.base_name} --minlength {params.ml} --trimqualities --minquality {params.mq} {params.tmns} --adapter1 {params.adapter_R1} --adapter2 {params.adapter_R2} \
@@ -261,14 +261,14 @@ rule e_fastqc:
         R1_truncated=rules.d_adapter_removal.output.R1_truncated,
         R2_truncated=rules.d_adapter_removal.output.R2_truncated,
     output:
-        done=touch(opj(OUTDIR,"done/e_fastqc/{sample_name}.done")),
+        done=touch(opj(OUTDIR, "done/e_fastqc/{sample_name}.done")),
     group:
         "QC"
     priority: 1
     log:
-        log=opj(OUTDIR,"log/e_fastqc/{sample_name}.log"),
+        log=opj(OUTDIR, "log/e_fastqc/{sample_name}.log"),
     params:
-        out_dir=opj(OUTDIR,"reports/fastqc/"),
+        out_dir=opj(OUTDIR, "reports/fastqc/"),
     resources:
         mem_mb = 30000,
         runtime_min = 3600, 
@@ -276,7 +276,7 @@ rule e_fastqc:
         disk_mb = 30000, 
     threads: 4
     benchmark:
-        opj(OUTDIR,"benchmark/e_fastqc/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/e_fastqc/{sample_name}.tsv"),
     conda:
         "envs/fastqc.yaml"
     shell:
@@ -303,13 +303,13 @@ rule f_host_mapping:
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
 
-        done=touch(opj(OUTDIR,"done/f_host_mapping/{sample_name}.done")),
+        done=touch(opj(OUTDIR, "done/f_host_mapping/{sample_name}.done")),
     priority: 49
     params:
         reference=config["reference_genome_dir"]+"/"+config["reference_genome"],
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/f_host_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/f_host_mapping/{sample_name}.tsv"),
     conda:
         "envs/mapping.yaml"
     resources:
@@ -343,7 +343,7 @@ rule ff_chm13_mapping:
     priority: 50
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/ff_chm13_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/ff_chm13_mapping/{sample_name}.tsv"),
     params:
         ref_genome_dir=config['reference_genome_dir'],
     conda:
@@ -379,7 +379,7 @@ rule ff_grch38_mapping:
     priority: 50
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/ff_grch38_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, "benchmark/ff_grch38_mapping/{sample_name}.tsv"),
     params:
         ref_genome_dir=config['reference_genome_dir'],
     conda:
@@ -424,10 +424,10 @@ rule fff_kraken2_standardDB:
         k2_grch38_out=temp(opj(OUTDIR,'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output')),
         k2_grch38_clf=opj(OUTDIR,'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output_classified'),
 
-        done_chm13_grch38=touch(opj(OUTDIR,"done/fff_kraken2_standardDB/{sample_name}_conf{k2_threshold}.done")),
+        done_chm13_grch38=touch(opj(OUTDIR, "done/fff_kraken2_standardDB/{sample_name}_conf{k2_threshold}.done")),
     priority: 50
     benchmark:
-        opj(OUTDIR,"benchmark/fff_kraken2_standardDB/{sample_name}_conf{k2_threshold}.tsv"),
+        opj(OUTDIR, "benchmark/fff_kraken2_standardDB/{sample_name}_conf{k2_threshold}.tsv"),
     conda:
         "envs/kracken.yaml"
     resources:
@@ -460,7 +460,7 @@ rule g_kraken2:
         k2_output_hm=temp(opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output')),
         k2_output_class_hm=opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
 
-        done=touch(opj(OUTDIR,"done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done")),
+        done=touch(opj(OUTDIR, "done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done")),
     priority: 60
     resources:
         mem_mb = 128000,
@@ -469,7 +469,7 @@ rule g_kraken2:
         disk_mb = 128000,
     threads: 8
     benchmark:
-        opj(OUTDIR,"benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv"),
+        opj(OUTDIR, "benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv"),
     conda:
         "envs/kraken.yaml"
     shell:
