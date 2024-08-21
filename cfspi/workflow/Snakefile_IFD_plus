@@ -49,7 +49,7 @@ rule all:
 
         #fastqc
         expand("{OUTDIR}done/e_fastqc/{sample_name}.done", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-        
+
         #QC
         expand("{OUTDIR}results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
@@ -67,10 +67,10 @@ rule all:
         expand("{OUTDIR}results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         expand("{OUTDIR}results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR), 
-        expand("{OUTDIR}results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR), 
-	expand("{OUTDIR}results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 	
-	expand("{OUTDIR}results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/kraken2_standardDB_report/chm13/{sample_name}_conf{k2_threshold}.report", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/kraken2_standardDB_report/grch38/{sample_name}_conf{k2_threshold}.report", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR), 
         expand("{OUTDIR}results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output_classified", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
@@ -156,7 +156,7 @@ rule b_unique_nubeam:
     shell:
         """
         ./resources/nubeam-dedup -i1 {input.R1_raw} -i2 {input.R2_raw} -o1 {output.R1_nubeam} -o2 {output.R2_nubeam} -s 1 -r 0 2>&1 > {log.log};
-        
+
         echo $(cat {output.R1_nubeam}| wc -l )/4 | bc > '{output.stats_R1}';
         echo $(cat {output.R2_nubeam}| wc -l )/4 | bc > '{output.stats_R2}';
         """
@@ -171,7 +171,7 @@ rule c_fastp:
 
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
-        
+
         html=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.html"),
         json=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.json"),
         failed=temp(opj(OUTDIR,"results/tmp/fastp_{sample_name}.fastq")),
@@ -196,7 +196,7 @@ rule c_fastp:
         """
         fastp --thread {threads} --in1 {input.R1_nubeam} --in2 {input.R2_nubeam} --out1 {output.R1_trimmed} --out2 {output.R2_trimmed} \
         --failed_out {output.failed} -h {output.html} -j {output.json} 2>&1 > {log.log};
-        
+
         echo $(cat {output.R1_trimmed} | wc -l )/4 | bc  > '{output.stats_R1}';
         echo $(cat {output.R2_trimmed} | wc -l )/4 | bc  > '{output.stats_R2}';
         """
@@ -246,7 +246,7 @@ rule d_adapter_removal:
         """
         AdapterRemoval --threads {threads} --file1 {input.R1_trimmed} --file2 {input.R2_trimmed} --basename {params.base_name} --minlength {params.ml} --trimqualities --minquality {params.mq} {params.tmns} --adapter1 {params.adapter_R1} --adapter2 {params.adapter_R2} \
         --output1 {output.R1_truncated} --output2 {output.R2_truncated} --singleton {output.singleton} --discarded {output.discarded} --settings {output.settings} 2>&1 > {log.log};
-        
+
         echo $(cat {output.R1_truncated} | wc -l )/4 | bc > {output.stats_R1};
         echo $(cat {output.R2_truncated} | wc -l )/4 | bc > {output.stats_R2};
 
@@ -284,7 +284,7 @@ rule e_fastqc:
         mkdir -p {params.out_dir}
         fastqc -t 1 -o {params.out_dir} {input.R1_raw} 2>&1 > {log.log};
         fastqc -t 1 -o {params.out_dir} {input.R2_raw} 2>&1 > {log.log};
-     
+
         fastqc -t 1 -o {params.out_dir} {input.R1_truncated} 2>&1 > {log.log};
         fastqc -t 1 -o {params.out_dir} {input.R2_truncated} 2>&1 > {log.log};
         """
@@ -333,7 +333,7 @@ rule ff_chm13_mapping:
     output:
         host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_chm13_pe.sam')),
         host_bam=temp(opj(OUTDIR, 'results/chm13_mapping/{sample_name}_alligned_chm13_pe.bam')),
-	host_bam_sorted=opj(OUTDIR, 'results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam'),
+        host_bam_sorted=opj(OUTDIR, 'results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam'),
 
         host_unmpd_r1=opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq'),
         host_unmpd_r2=opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq'),
@@ -357,7 +357,7 @@ rule ff_chm13_mapping:
         """
         bowtie2 -p {threads} -x {params.ref_genome_dir}chm13v2.0 -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
         samtools view -b {output.host_sam} -o {output.host_bam};
-	samtools sort {output.host_bam} -o {output.host_bam_sorted};
+        samtools sort {output.host_bam} -o {output.host_bam_sorted};
         samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};
@@ -401,11 +401,11 @@ rule ff_grch38_mapping:
 rule fff_kraken2_standardDB:
     input:
         R1_chm13_grch38=rules.f_host_mapping.output.host_unmpd_r1,
-        R2_chm13_grch38=rules.f_host_mapping.output.host_unmpd_r2,    
+        R2_chm13_grch38=rules.f_host_mapping.output.host_unmpd_r2,
 
         R1_chm13=rules.ff_chm13_mapping.output.host_unmpd_r1,
         R2_chm13=rules.ff_chm13_mapping.output.host_unmpd_r2,   
-        
+
         R1_grch38=rules.ff_grch38_mapping.output.host_unmpd_r1,
         R2_grch38=rules.ff_grch38_mapping.output.host_unmpd_r2,   
     params:
@@ -446,7 +446,6 @@ rule fff_kraken2_standardDB:
 
         kraken2 --confidence {params.threshold} --db {params.database_dir}RS_minusT2T --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_grch38_out} --report {output.k2_grch38_rep} --paired {input.R1_grch38} {input.R2_grch38} ; 
         grep -v "^U"  {output.k2_grch38_out} > {output.k2_grch38_clf};
-
         """
 
 rule g_kraken2:
