@@ -34,7 +34,7 @@ This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
-An example samplesheet can be found at **`config/samples.txt`** and an example configfil at **`config/config_samples.yaml`**. 
+An example samplesheet can be found at **`config/samples.txt`** and an example configfile at **`config/config_samples.yaml`**. 
 
 In **`config/samples.txt`**, ensure to specify the following: 
 - *sample_name*: Specify name of your sample.
