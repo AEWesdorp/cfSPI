@@ -47,7 +47,7 @@ In **`config/config_samples.yaml`**, ensure to specify the following:
 
 General Settings:
 - *units*: Specify name of the samplesheet (for example, `config/samples.tsv`). 
-- *output_folder*: Set a unique name. Outut folder will be generated within the *outdir*
+- *output_folder*: Set a unique name. Output folder will be generated within the *outdir*. 
 - *outdir*: Specify the output directory where results will be stored.
 
 Reference Genome Settings:
