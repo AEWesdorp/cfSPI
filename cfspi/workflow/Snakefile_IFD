@@ -331,7 +331,9 @@ rule g_kraken2:
         "envs/kraken.yaml"
     shell:
         """
-        kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} --report-zero-counts --report-minimizer-data --output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
+        kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} \
+        --report-zero-counts --report-minimizer-data \
+        --output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
 
