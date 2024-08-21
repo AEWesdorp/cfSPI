@@ -345,7 +345,7 @@ rule ff_chm13_mapping:
     benchmark:
         opj(OUTDIR, "benchmark/ff_chm13_mapping/{sample_name}.tsv"),
     params:
-        ref_genome_dir=config['reference_genome_dir'],
+        ref_genome_dir=config['reference_genome_dir']+"/",
     conda:
         "envs/mapping.yaml"
     resources:
@@ -381,7 +381,7 @@ rule ff_grch38_mapping:
     benchmark:
         opj(OUTDIR, "benchmark/ff_grch38_mapping/{sample_name}.tsv"),
     params:
-        ref_genome_dir=config['reference_genome_dir'],
+        ref_genome_dir=config['reference_genome_dir']+"/",
     conda:
         "envs/mapping.yaml"
     resources:
@@ -410,7 +410,7 @@ rule fff_kraken2_standardDB:
         R2_grch38=rules.ff_grch38_mapping.output.host_unmpd_r2,   
     params:
         threshold="{k2_threshold}", 
-        database_dir=config['database_dir'],
+        database_dir=config['database_dir']+"/",
     output:
         k2_chm13_grch38_rep=opj(OUTDIR, 'results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report'),
         k2_chm13_grch38_out=temp(opj(OUTDIR, 'results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output')),
