@@ -251,7 +251,7 @@ rule e_fastqc:
         runtime_min = 3600, 
         cpus = 16, 
         disk_mb = 30000, 
-    threads: 4
+    threads: 1
     benchmark:
         opj(OUTDIR,"benchmark/e_fastqc/{sample_name}.tsv"),
     conda:
