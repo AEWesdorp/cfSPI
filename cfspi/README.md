@@ -30,23 +30,23 @@ We obtained the GRCh38.p14 'Genome sequence (FASTA)' from the [NCBI RefSeq](http
 cat GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0.fa > chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
 bowtie2-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
 ```
-This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**, which should be referenced in the `config/config_samples.yaml` file under the *reference_genome_dir* and *reference_genome* fields, respectively (see below).
+This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**, which should be referenced in the `./config/config_samples.yaml` file under the *reference_genome_dir* and *reference_genome* fields, respectively (see below).
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
-An example samplesheet can be found at **`config/samples.tsv`** and an example configfile at **`config/config_samples.yaml`**. 
+An example samplesheet can be found at **`./config/samples.tsv`** and an example configfile at **`./config/config_samples.yaml`**. 
 
-In **`config/samples.tsv`**, ensure to specify the following: 
+In **`./config/samples.tsv`**, ensure to specify the following: 
 - *sample_name*: Specify name of your sample.
 - *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
 - *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
 - *UDI*: Set the UDI of the sample.
 - *path_to_R1_R2*: Provide the directory path where raw sequencing files are stored (path to `*R1*.fastq.gz`, `*R2*.fastq.gz`) 
   
-In **`config/config_samples.yaml`**, ensure to specify the following:
+In **`./config/config_samples.yaml`**, ensure to specify the following:
 
 General Settings:
-- *units*: Specify name of the samplesheet (for example, `config/samples.tsv`). 
+- *units*: Specify name of the samplesheet (for example, `./config/samples.tsv`). 
 - *output_folder*: Set a unique name. Output folder will be generated within the *outdir*. 
 - *outdir*: Specify the output directory where results will be stored.
 
