@@ -19,7 +19,7 @@ include: "rules/trim.smk"
 print("Unit file path:", config["units"])
 
 ###
-OUTDIR=config["outdir"]+"/"+config['output_folder']
+OUTDIR=config["outdir"]+"/"+config['output_folder']+"/"
 
 ## sort memory and disk  requirement 
 def get_mem_mb(wildcards, attempt):
