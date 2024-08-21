@@ -18,7 +18,7 @@ reference_genome_dir: /example/name/host_genome/directory/
 database:
 - EPRSc2
 
-db_dir: /example/database/directory/
+database_dir: /example/database/directory/
 
 k2_threshold: [0.4] #if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
