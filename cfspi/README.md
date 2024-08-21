@@ -41,22 +41,22 @@ In **`./config/samples.tsv`**, ensure to specify the following:
 - *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
 - *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
 - *UDI*: Set the UDI of the sample.
-- *path_to_R1_R2*: Provide the directory path where raw sequencing files are stored (path to `*R1*.fastq.gz`, `*R2*.fastq.gz`) 
+- *path_to_R1_R2*: Please provide the absolute directory path where the raw sequencing files are stored (path to `*R1*.fastq.gz`, `*R2*.fastq.gz`). 
   
 In **`./config/config_samples.yaml`**, ensure to specify the following:
 
 General Settings:
-- *units*: Specify name of the samplesheet (for example, `./config/samples.tsv`). 
-- *output_folder*: Set a unique name. Output folder will be generated within the *outdir*. 
-- *outdir*: Specify the output directory where results will be stored.
+- *units*: Specify name of the samplesheet (for example, `./config/samples.tsv`). Relative path recommended.  
+- *output_folder*: Please provide a unique name. An output folder with this name will be created within the specified *outdir*.
+- *outdir*: Please provide the absolute path to the output directory where the *output_folder* will be generated and the results will be stored.
 
 Reference Genome Settings:
-- *reference_genome*: Indicate the reference genome to be used.
-- *reference_genome_dir*: Provide the directory path where the reference genome is stored.
+- *reference_genome*: Indicate the reference genome to be used. We recommend using the dual-genome `chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`
+- *reference_genome_dir*: Please provide the absolute path to the directory where the reference genome is stored.
 
 Kraken2 Classification Settings:
-- *database*: Specify the database used for Kraken2 classification.
-- *database_dir*: Define the directory path where the Kraken2 database is located.
+- *database*: Specify the name of the database(s) to be used for kraken2 classification. Please note that the database(s) are not included in this GitHub repository.
+- *database_dir*: Provide the absolute path to the directory where the kraken2 database(s) are located.
 - *k2_threshold*: Set the threshold value for Kraken2 classification.
 
 ## Running the cfspi-pipeline on an interactive node
