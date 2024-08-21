@@ -58,7 +58,6 @@ rule all:
         expand("{OUTDIR}results/host_mapping/{sample_name}_unmapped_host_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/host_mapping/{sample_name}_unmapped_host_r2.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
-
         #kraken output
         expand("{OUTDIR}results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report", database=config['database'], k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified", database=config['database'], k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
@@ -69,7 +68,6 @@ rule all:
 
         expand("{OUTDIR}results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR), 
         expand("{OUTDIR}results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR), 
-        #expand("{OUTDIR}results/chm13_mapping/{sample_name}_alligned_chm13_pe.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 	expand("{OUTDIR}results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 	
 	expand("{OUTDIR}results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report", k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
