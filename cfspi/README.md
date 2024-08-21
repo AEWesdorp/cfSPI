@@ -55,7 +55,7 @@ Reference Genome Settings:
 - *reference_genome_dir*: Please provide the absolute path to the directory where the reference genome is stored.
 
 Kraken2 Classification Settings:
-- *database*: Specify the name of the database(s) to be used for kraken2 classification. Please note that the database(s) are not included in this GitHub repository.
+- *database*: Specify the name of the database(s) to be used for kraken2 classification. Each database name should correspond to a directory within the *database_dir*. the *database* folder should be containing all necessary database files (e.g., `hash.k2d`, `opts.k2d`, `taxo.k2d`). Please note that the database(s) are not included in this GitHub repository.
 - *database_dir*: Provide the absolute path to the directory where the kraken2 database(s) are located.
 - *k2_threshold*: Set the threshold value for Kraken2 classification.
 
