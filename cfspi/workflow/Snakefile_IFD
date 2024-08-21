@@ -283,7 +283,7 @@ rule f_host_mapping:
         done=touch(opj(OUTDIR,"done/f_host_mapping/{sample_name}.done")),
     priority: 49
     params:
-        reference=config["reference_genome_dir"]+"/"+config["reference_genome"],
+        reference=config["reference_genome"]+"/"+config["reference_genome"],
     threads: 32
     benchmark:
         opj(OUTDIR,"benchmark/f_host_mapping/{sample_name}.tsv"),
@@ -310,7 +310,7 @@ rule g_kraken2:
         unm_r1 = rules.f_host_mapping.output.host_unmpd_r1,
         unm_r2 = rules.f_host_mapping.output.host_unmpd_r2,
     params:
-        db = config["database_dir"]+"/"+"{database}",
+        db = config["database"]+"/"+"{database}",
         threshold="{k2_threshold}", 
     output:
         k2_report_hm=opj(OUTDIR,'results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report'),
@@ -355,7 +355,7 @@ rule ff_chm13_mapping:
     benchmark:
         opj(OUTDIR,"benchmark/ff_chm13_mapping/{sample_name}.tsv"),
     params:
-        ref_genome_dir=config['reference_genome_dir'],
+        ref_genome=config['reference_genome']+"/",
     conda:
         "envs/mapping.yaml"
     resources:
@@ -365,7 +365,7 @@ rule ff_chm13_mapping:
         disk_mb = 10000,
     shell:
         """
-        bowtie2 -p {threads} -x {params.ref_genome_dir}chm13v2.0 -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
+        bowtie2 -p {threads} -x {params.ref_genome}chm13v2.0 -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
         samtools view -b {output.host_sam} -o {output.host_bam};
 
         samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
@@ -392,7 +392,7 @@ rule ff_grch38_mapping:
     benchmark:
         opj(OUTDIR,"benchmark/ff_grch38_mapping/{sample_name}.tsv"),
     params:
-        ref_genome_dir=config['reference_genome_dir'],
+        ref_genome=config['reference_genome']+"/",
     conda:
         "envs/mapping.yaml"
     resources:
@@ -402,7 +402,7 @@ rule ff_grch38_mapping:
         disk_mb = 10000,
     shell:
         """
-        bowtie2 -p {threads} -x {params.ref_genome_dir}GCF_000001405.40_GRCh38.p14_genomic -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
+        bowtie2 -p {threads} -x {params.ref_genome}GCF_000001405.40_GRCh38.p14_genomic -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
         samtools view -b {output.host_sam} -o {output.host_bam};
         samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
 
