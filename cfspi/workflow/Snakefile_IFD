@@ -87,7 +87,7 @@ rule a_concat_fastq:
         stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_01_raw_fastq.txt'),
         stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_01_raw_fastq.txt'),
 
-        R1_raw_gz=opj(opj(OUTDIR, 'results/raw_fastq/{sample_name}_R1.fastq.gz')),
+        R1_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R1.fastq.gz')),
         R2_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R2.fastq.gz')),
 
         done=touch(opj(OUTDIR,"done/a_concat_fastq/{sample_name}.done")),
