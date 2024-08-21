@@ -41,7 +41,7 @@ In **`./config/samples.tsv`**, ensure to specify the following:
 - *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
 - *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
 - *UDI*: Set the UDI of the sample.
-- *path_to_R1_R2*: Please provide the absolute directory path where the raw sequencing files are stored (path to `*R1*.fastq.gz`, `*R2*.fastq.gz`). 
+- *path_to_R1_R2*: Please provide the absolute directory path where the raw sequencing files are stored (path to `*_R1_*.fastq.gz`, `*_R2_*.fastq.gz`). 
   
 In **`./config/config_samples.yaml`**, ensure to specify the following:
 
