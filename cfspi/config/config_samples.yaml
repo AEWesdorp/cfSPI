@@ -1,8 +1,8 @@
 ############################################ PLEASE MODIFY ############################################
 ## snakemake parameters
 units: ./config/samples.tsv
-output_folder: example_name_output_folder/
-outdir: /example/name/output/directory
+output_folder: example_name_output_folder/ #folder that will be generated within the 'outdir'
+outdir: /example/name/output/directory 
 
 # AdapterRemoval
 adapter_removal:
