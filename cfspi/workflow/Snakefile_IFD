@@ -324,7 +324,7 @@ rule g_kraken2:
         runtime_min = 60,
         cpus = 16,
         disk_mb = 128000,
-    threads: 8
+    threads: 16
     benchmark:
         opj(OUTDIR,"benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv"),
     conda:
