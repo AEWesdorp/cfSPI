@@ -79,7 +79,6 @@ Kraken2 Classification Settings:
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
 4. Activate your conda environment.
     ```bash
-    # Activate the environment "cfspi_env"
     conda activate cfspi_env
     ```
 5. Run the snakemake pipeline.
