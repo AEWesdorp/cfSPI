@@ -101,11 +101,11 @@ rule a_concat_fastq:
         R1_raw=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1.fastq')),
         R2_raw=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2.fastq')),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_01_raw_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_01_raw_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_01_raw_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_01_raw_fastq.txt'),
 
-        R1_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R1.fastq.gz')),
-        R2_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R2.fastq.gz')),
+        R1_raw_gz=opj(opj(OUTDIR, 'results/raw_fastq/{sample_name}_R1.fastq.gz')),
+        R2_raw_gz=opj(opj(OUTDIR, 'results/raw_fastq/{sample_name}_R2.fastq.gz')),
 
         done=touch(opj(OUTDIR, "done/a_concat_fastq/{sample_name}.done")),
     benchmark:
@@ -137,8 +137,8 @@ rule b_unique_nubeam:
         R1_nubeam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_uniq.fastq')),   
         R2_nubeam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2_uniq.fastq')),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
 
         done=touch(opj(OUTDIR, "done/b_unique_nubeam/{sample_name}.done")),
     priority: 46
@@ -169,8 +169,8 @@ rule c_fastp:
         R1_trimmed=temp(opj(OUTDIR, "results/tmp/{sample_name}_R1_trimmed.fastq")),
         R2_trimmed=temp(opj(OUTDIR, "results/tmp/{sample_name}_R2_trimmed.fastq")),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
 
         html=opj(OUTDIR, "reports/fastp/{sample_name}_fastp.html"),
         json=opj(OUTDIR, "reports/fastp/{sample_name}_fastp.json"),
@@ -207,14 +207,14 @@ rule d_adapter_removal:
         R2_trimmed=rules.c_fastp.output.R2_trimmed,
     output:
         singleton=temp(opj(OUTDIR, "results/tmp/{sample_name}_singleton_trimmed_truncated")),
-        R1_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq')),
-        R2_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq')),
+        R1_truncated=temp(opj(OUTDIR, 'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq')),
+        R2_truncated=temp(opj(OUTDIR, 'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq')),
 
-        R1_truncated_gz=opj(OUTDIR,'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq.gz'),
-        R2_truncated_gz=opj(OUTDIR,'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq.gz'),
+        R1_truncated_gz=opj(OUTDIR, 'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq.gz'),
+        R2_truncated_gz=opj(OUTDIR, 'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq.gz'),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_04_adapt_remov_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_04_adapt_remov_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_04_adapt_remov_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_04_adapt_remov_fastq.txt'),
 
         settings=opj(OUTDIR, "reports/adapter_removal/{sample_name}_adapter_removal_settings.txt"),
         discarded=temp(opj(OUTDIR, "results/tmp/{sample_name}_trimmed_discarded.fastq")),
@@ -297,11 +297,11 @@ rule f_host_mapping:
         host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_host_pe.sam')),
         host_bam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_host_pe.bam')),
 
-        host_unmpd_r1=opj(OUTDIR,'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
-        host_unmpd_r2=opj(OUTDIR,'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
+        host_unmpd_r1=opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
+        host_unmpd_r2=opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
 
         done=touch(opj(OUTDIR, "done/f_host_mapping/{sample_name}.done")),
     priority: 49
@@ -335,11 +335,11 @@ rule ff_chm13_mapping:
         host_bam=temp(opj(OUTDIR, 'results/chm13_mapping/{sample_name}_alligned_chm13_pe.bam')),
         host_bam_sorted=opj(OUTDIR, 'results/chm13_mapping/{sample_name}_alligned_chm13_pe_sorted.bam'),
 
-        host_unmpd_r1=opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq'),
-        host_unmpd_r2=opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq'),
+        host_unmpd_r1=opj(OUTDIR, 'results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq'),
+        host_unmpd_r2=opj(OUTDIR, 'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq'),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_XX_chm13_mapp_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_chm13_mapp_fastq.txt'),
     priority: 50
     threads: 32
     benchmark:
@@ -371,11 +371,11 @@ rule ff_grch38_mapping:
         host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_grch38_pe.sam')),
         host_bam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_grch38_pe.bam')),
 
-        host_unmpd_r1=opj(OUTDIR,'results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq'),
-        host_unmpd_r2=opj(OUTDIR,'results/grch38_mapping/{sample_name}_unmapped_grch38_r2.fq'),
+        host_unmpd_r1=opj(OUTDIR, 'results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq'),
+        host_unmpd_r2=opj(OUTDIR, 'results/grch38_mapping/{sample_name}_unmapped_grch38_r2.fq'),
 
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_XX_grch38_mapp_fastq.txt'),
+        stats_R1=opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt'),
+        stats_R2=opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_grch38_mapp_fastq.txt'),
     priority: 50
     threads: 32
     benchmark:
@@ -412,17 +412,17 @@ rule fff_kraken2_standardDB:
         threshold="{k2_threshold}", 
         database_dir=config['database_dir'],
     output:
-        k2_chm13_grch38_rep=opj(OUTDIR,'results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report'),
-        k2_chm13_grch38_out=temp(opj(OUTDIR,'results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output')),
-        k2_chm13_grch38_clf=opj(OUTDIR,'results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output_classified'),
+        k2_chm13_grch38_rep=opj(OUTDIR, 'results/kraken2_standardDB_report/chm13_grch38/{sample_name}_conf{k2_threshold}.report'),
+        k2_chm13_grch38_out=temp(opj(OUTDIR, 'results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output')),
+        k2_chm13_grch38_clf=opj(OUTDIR, 'results/kraken2_standardDB_output/chm13_grch38/{sample_name}_conf{k2_threshold}.output_classified'),
 
-        k2_chm13_rep=opj(OUTDIR,'results/kraken2_standardDB_report/chm13/{sample_name}_conf{k2_threshold}.report'),
-        k2_chm13_out=temp(opj(OUTDIR,'results/kraken2_standardDB_output/chm13/{sample_name}_conf{k2_threshold}.output')),
-        k2_chm13_clf=opj(OUTDIR,'results/kraken2_standardDB_output/chm13/{sample_name}_conf{k2_threshold}.output_classified'),
+        k2_chm13_rep=opj(OUTDIR, 'results/kraken2_standardDB_report/chm13/{sample_name}_conf{k2_threshold}.report'),
+        k2_chm13_out=temp(opj(OUTDIR, 'results/kraken2_standardDB_output/chm13/{sample_name}_conf{k2_threshold}.output')),
+        k2_chm13_clf=opj(OUTDIR, 'results/kraken2_standardDB_output/chm13/{sample_name}_conf{k2_threshold}.output_classified'),
 
-        k2_grch38_rep=opj(OUTDIR,'results/kraken2_standardDB_report/grch38/{sample_name}_conf{k2_threshold}.report'),
-        k2_grch38_out=temp(opj(OUTDIR,'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output')),
-        k2_grch38_clf=opj(OUTDIR,'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output_classified'),
+        k2_grch38_rep=opj(OUTDIR, 'results/kraken2_standardDB_report/grch38/{sample_name}_conf{k2_threshold}.report'),
+        k2_grch38_out=temp(opj(OUTDIR, 'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output')),
+        k2_grch38_clf=opj(OUTDIR, 'results/kraken2_standardDB_output/grch38/{sample_name}_conf{k2_threshold}.output_classified'),
 
         done_chm13_grch38=touch(opj(OUTDIR, "done/fff_kraken2_standardDB/{sample_name}_conf{k2_threshold}.done")),
     priority: 50
@@ -456,9 +456,9 @@ rule g_kraken2:
         db = config["database_dir"]+"/"+"{database}",
         threshold="{k2_threshold}", 
     output:
-        k2_report_hm=opj(OUTDIR,'results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report'),
-        k2_output_hm=temp(opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output')),
-        k2_output_class_hm=opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
+        k2_report_hm=opj(OUTDIR, 'results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report'),
+        k2_output_hm=temp(opj(OUTDIR, 'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output')),
+        k2_output_class_hm=opj(OUTDIR, 'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
 
         done=touch(opj(OUTDIR, "done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done")),
     priority: 60
