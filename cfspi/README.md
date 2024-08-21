@@ -34,9 +34,9 @@ This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_
 
 ## Create a samplesheet and configfile 
 Create a samplesheet and a configfile in folder `configs/` accordingly. 
-An example samplesheet can be found at **`config/samples.txt`** and an example configfile at **`config/config_samples.yaml`**. 
+An example samplesheet can be found at **`config/samples.tsv`** and an example configfile at **`config/config_samples.yaml`**. 
 
-In **`config/samples.txt`**, ensure to specify the following: 
+In **`config/samples.tsv`**, ensure to specify the following: 
 - *sample_name*: Specify name of your sample.
 - *library_prep*: Specify the library preparation you have used (options: `SRSLY` or `KAPA`)
 - *adapter_type*: Specify which adapter were used during Illumina library contstruction (options: `SRSLY_dual_index`, `KAPA_single_index` or `IDT384UMI_dual`)
@@ -46,7 +46,7 @@ In **`config/samples.txt`**, ensure to specify the following:
 In **`config/config_samples.yaml`**, ensure to specify the following:
 
 General Settings:
-- *units*: Specify name of the samplesheet (for example, `config/samples.txt`). 
+- *units*: Specify name of the samplesheet (for example, `config/samples.tsv`). 
 - *run_name*: Set a unique name for the run.
 - *outdir*: Specify the output directory where results will be stored.
 
