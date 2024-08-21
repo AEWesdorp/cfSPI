@@ -8,7 +8,7 @@ min_version("6.3.0")
 
 # This defines the sample name should never contain underscore to avoid confusing rule determination.
 wildcard_constraints:
-    sample_name='[^_\W]+'
+    sample_name='[^_\\W]+'
 
 report: "report/workflow.rst"
 
