@@ -15,7 +15,7 @@ All data pre-processing and figure generation were performed utilizing `R` versi
 - gplots 3.1.3
 - Hmisc 5.1-0
 - khroma 1.11.0
-- patchwork 1.1.2
+- patchwork 1.3.0
 - readr 2.1.4
 - reshape2 1.4.4
 - Rsamtools 2.14.0
