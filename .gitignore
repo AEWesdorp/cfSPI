@@ -10,8 +10,10 @@ mapAspergillus/resources/EPRSc2_Aspergillus/*
 figures/.ipynb_checkpoints/
 figures/ipynb_to_R.ipynb
 figures/Suppl_Figures/.ipynb_checkpoints*
-figures/Suppl_Figures/*.ipynb
+#figures/Suppl_Figures/*.ipynb
 figures/Figures/.ipynb_checkpoints*
-figures/Figures/*.ipynb
+#figures/Figures/*.ipynb
+figures/processing/.ipynb_checkpoints*
 
 output/
+cfspi_output/ #output cfspi
