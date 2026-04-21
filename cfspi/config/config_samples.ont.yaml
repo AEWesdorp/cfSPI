@@ -1,0 +1,19 @@
+############################################ PLEASE MODIFY ############################################
+## snakemake parameters
+units: /hpc/compgen/projects/cf-spi/cf-spi/analysis/pvanrijn/repo/cfSPI/cfspi/config/samples.ont.tsv
+# units: /path/to/cfSPI/cfspi/config/samples.ont.tsv
+seq_summary: /hpc/compgen/projects/cf-spi/cf-spi/raw/ONT/20260317_Run1_FungalProject_EWJS/no_sample_id/20260317_1340_2A_PBA75592_374113f8/sequencing_summary_PBA75592_374113f8_3882ff10.txt
+# seq_summary: /path/to/ONTrun/sequencing_summary.txt
+outdir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/pvanrijn/pipeline-out
+# outdir: /path/to/pipeline/output/directory
+output_folder: 260407_test #folder that will be generated within the 'outdir'
+# output_folder: MyPipelineOutput #folder that will be generated within the 'outdir'
+
+reference_genome: chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.mmi
+reference_genome_dir: /hpc/compgen/projects/cf-spi/cf-spi/ref/genomes
+
+database_dir: /hpc/compgen/projects/cf-spi/cf-spi/analysis/ewesdorp/make_database
+# database_dir: /path/to/kraken2-database-directory
+database: [EPRSc2]
+
+k2_threshold: [0.4] #if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
