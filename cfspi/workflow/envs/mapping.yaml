@@ -1,5 +1,5 @@
+name: mapping
 channels:
-  - default
   - conda-forge
   - bioconda
 dependencies:

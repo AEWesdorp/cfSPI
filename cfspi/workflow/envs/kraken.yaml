@@ -1,5 +1,5 @@
-channels: 
-  - default
+name: kraken
+channels:
   - conda-forge
   - bioconda
 dependencies:
