@@ -1,8 +1,5 @@
 import pandas as pd
 
-#configfile: "config/config.yaml"
-
-
 # unit name = unique name?
 units = (
     pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "unit_name": str}, skipinitialspace=True)
