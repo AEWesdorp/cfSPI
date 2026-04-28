@@ -6,19 +6,19 @@ units = (
 )
 
 SRSLY_index = (
-    pd.read_csv("resources/adapter_indexes/SRSLY_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(config["file_srsly"], sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
 
 IDT384UMI_index = (
-    pd.read_csv("resources/adapter_indexes/IDT384UMI_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(config["file_idt384umi"], sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
 
 KAPA_index = (
-    pd.read_csv("resources/adapter_indexes/KAPA_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(config["file_kapa"], sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
