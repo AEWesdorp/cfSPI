@@ -1,7 +1,6 @@
+name: fastplong
 channels: 
-  - default
   - conda-forge
   - bioconda
 dependencies:
-  - python=3.10
-  - kraken2=2.1
+  - fastplong

@@ -1,8 +1,4 @@
-import glob
 import pandas as pd
-
-#configfile: "config/config.yaml"
-
 
 # unit name = unique name?
 units = (

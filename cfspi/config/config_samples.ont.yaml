@@ -1,0 +1,14 @@
+############################################ PLEASE MODIFY ############################################
+## snakemake parameters
+units: /path/to/cfSPI/cfspi/config/samples.ont.tsv
+sequencing_summary: /path/to/nanopore-run/sequencing_summary.txt
+outdir: /path/to/pipeline/output-dir
+output_folder: MyPipelineOutput  # folder that will be generated within the 'outdir'
+
+reference_genome: chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.mmi
+reference_genome_dir: /path/to/ref-genome-dir
+
+database_dir: /path/to/kraken2-database-directory
+database: [EPRSc2]
+
+k2_threshold: [0.4]  # if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]

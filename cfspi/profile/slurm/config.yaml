@@ -1,16 +1,26 @@
-jobs: 100
-cluster:
-  mkdir -p slurm_logs && 
-  sbatch -t {resources.runtime_min} --mem={resources.mem_mb}M --cpus-per-task {resources.cpus} --gres=tmpspace:{resources.disk_mb} -o slurm_logs/{rule}_{wildcards}-%j.stout.log -e slurm_logs/{rule}_{wildcards}-%j.error.log --parsable
+# SLURM specific stuff
+executor: slurm
+default-resources:
+  threads: 1
+  slurm_account: None   # CHANGE
+  slurm_partition: None # CHANGE
+slurm-requeue: True
+slurm-status-command: sacct
+
+# Conda stuff
 use-conda: True
-use-singularity: True
+conda-frontend: conda
+conda-prefix: /path/to/dir/for/conda/envs  # CHANGE
+
+# Singularity/Apptainer stuff
+# use-singularity: True
+
+# General stuff
+jobs: 100
 latency-wait: 240
 restart-times: 3
 keep-going: True
 rerun-incomplete: True
 printshellcmds: True
-reason: True
-cluster-cancel: scancel
 show-failed-logs: True
-scheduler: greedy
-#cluster-status: "./status-sacct.sh" #  Use to handle timeout exception, do not forget to chmod +x
+

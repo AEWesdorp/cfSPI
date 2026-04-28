@@ -6,10 +6,10 @@ In short, duplicates were removed (using nubeam), after which high-quality seque
 ## Getting started
 To use the cfSPI-pipeline, follow these steps: 
 
-#### Prerequisites
+### Prerequisites
 1. Ensure you have `conda` installed on your system.
 
-#### Installation
+### Installation
 1. Clone the GitHub Repository:
     ```bash
     git clone https://github.com/AEWesdorp/cfSPI.git
@@ -21,21 +21,40 @@ To use the cfSPI-pipeline, follow these steps:
     # Activate the environment "cfspi_env"
     conda activate cfspi_env
     ```
+3. (Optional) If you plan on executing the pipeline on an HPC cluster running SLURM, then the corresponding [SLURM plugin](https://snakemake.github.io/snakemake-plugin-catalog/plugins/executor/slurm.html) should be installed:
+    ```
+    # Activate correct environment and install the plugin
+    conda activate cfspi_env
+    conda install -c bioconda snakemake-executor-plugin-slurm
+    ```
     
 ## Create a combined indexed version of the human reference genome 
-To mitigate potential false positives arising from incomplete host read subtraction, we implemented a dual-mapping strategy using `bowtie2-2.5.1`. This involved aligning reads to a combined host genome version comprising GRCh38.p14 and CHM13v2.
+To mitigate potential false positives arising from incomplete host read subtraction, we implemented a dual-mapping strategy using `bowtie2-2.5.1` for Illumina reads and `minimap2-2.30` for Nanopore (ONT) reads. This involved aligning reads to a combined host genome version comprising GRCh38.p14 and CHM13v2.
 
-We obtained the GRCh38.p14 'Genome sequence (FASTA)' from the [NCBI RefSeq](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.40/) and the CHM13v2 genome via this [GitHub repository](https://github.com/marbl/CHM13). To index these genomes, we executed the following commands:
+We obtained the GRCh38.p14 'Genome sequence (FASTA)' from the [NCBI RefSeq](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.40/) and the CHM13v2 genome via this [GitHub repository](https://github.com/marbl/CHM13). To index these genomes, we executed the following commands for `bowtie2`:
+
 ```bash
+# concatenate reference genomes
 cat GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0.fa > chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
+
+# index genomes with bowtie2
 bowtie2-build chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
+
+# index genomes with minimap2
+minimap2 -x map-ont -d chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.mmi chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic.fna
 ```
+
 This process yielded an indexed dual-genome, **`chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic`**.
 
 Note: If you plan to use the `Snakemake_IFD_plus` or are specifically interested in mapping to either `chm13v2.0.fa` or `GCF_000001405.40_GRCh38.p14_genomic.fna` using the default `Snakemake_IFD` pipeline, you can index these reference genomes with the following commands:
 ```bash
+# bowtie2
 bowtie2-build chm13v2.0.fa chm13v2.0
 bowtie2-build GCF_000001405.40_GRCh38.p14_genomic.fna GCF_000001405.40_GRCh38.p14_genomic
+
+# minimap2
+minimap2 -x map-ont -d GCF_000001405.40_GRCh38.p14_genomic.mmi GCF_000001405.40_GRCh38.p14_genomic.fna
+minimap2 -x map-ont -d chm13v2.0.mmi chm13v2.0.fna
 ```
 
 ## Create a samplesheet and configfile 
@@ -70,7 +89,7 @@ Kraken2 Classification Settings:
 2. Request an interactive node for for running the jobs (long enough to finish all jobs of one liquid biopsy sample, e.g. 24 hours), with 450G mem, 16 cores. 
 3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
 4. Activate your conda environment.
-      ```bash
+    ```bash
     conda activate cfspi_env
     ```
 5. Run the snakemake pipeline.
@@ -80,13 +99,12 @@ Kraken2 Classification Settings:
 
 ## Running the cfspi-pipeline by submitting jobs via [slurm](https://slurm.schedmd.com/documentation.html) scheduler:
 1. Start a screen session. 
-2. Request an interactive node for submitting jobs (long enough for all jobs to finish, e.g. 48 hours), with 16G mem, 2 cores.
-3. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
-4. Activate your conda environment.
+2. Move to the `cfspi/` sub-directory within the cloned Git directory where your workflow resides.
+3. Activate your conda environment.
     ```bash
     conda activate cfspi_env
     ```
-5. Run the snakemake pipeline.
+4. Run the snakemake pipeline.
    ```bash
    snakemake --configfile ./config/config_samples.yaml  --snakefile workflow/Snakefile_IFD  --profile ./profile/slurm --conda-frontend conda --use-conda
    ```
@@ -95,5 +113,16 @@ Kraken2 Classification Settings:
 More information See [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles) and page [snakemake slurm](https://snakemake.readthedocs.io/en/stable/executing/cluster.html#executing-on-slurm-clusters). 
 
 ## Trouble shooting
-- Input fasta folder always should contains following files to start with `*_R1_*.fastq.gz, *_R2_*.fastq.gz`
+- Input fasta folder always should contain the following files to start with:
+  - `*_R1_*.fastq.gz` and `*_R2_*.fastq.gz` for **Illumina reads**
+  - `*.fastq.gz` for **ONT reads**
 - The current pipeline version includes adapter sequence information utilized by the SRSLY Claret Kit, the KAPA Kit, and 384 IDT UMI's. If another library preparation method is employed, kindly update the `workflow/rules/trim.smk` file and append the adapter index sequences to the `resources/adapter_indexes/` directory.
+
+## Known issues
+
+### Hidden `.snakemake` directories
+`snakemake` handles its staging/caching/logging through a hidden `.snakemake` directory, which would normally be created in the current working directory (`workdir` setting in `snakemake`) of the terminal/shell from which the pipeline is executed. To prevent creating `.snakemake` directories in random locations and letting them grow out of control in terms of size, `workdir` is set to the output directory at the start of each `Snakefile`.
+
+**However:** a general pipeline execution log is created under `<shell pwd>/.snakemake/log` regardless of whether an alternate `workdir` is set or not, because the location for this log location is determined _before_ the `Snakefile` is parsed. All other staging/caching stuff is correctly placed in `<workdir>/.snakemake` though. 
+
+The `workdir` config cannot be set in the config files, so the only way to get _all_ contents of `.snakemake` in `<workdir>/.snakemake` is to set the `--directory` (`-d`) flag when starting the pipeline. 

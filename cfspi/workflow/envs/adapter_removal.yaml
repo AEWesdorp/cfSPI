@@ -1,3 +1,4 @@
+name: adapter_removal
 channels: 
   - bioconda
 dependencies:
