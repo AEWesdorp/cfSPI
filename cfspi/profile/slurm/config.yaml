@@ -4,7 +4,7 @@ default-resources:
   threads: 1
   slurm_account: None   # CHANGE
   slurm_partition: None # CHANGE
-slurm-requeue: True
+slurm-requeue: False
 slurm-status-command: sacct
 
 # Conda stuff
