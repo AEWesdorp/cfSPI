@@ -1,8 +1,9 @@
 # Main pipeline
 # Specify snakemake version
-from snakemake.utils import min_version
+import os
 from os.path import join as opj
-min_version("6.3.0")
+from snakemake.utils import min_version
+min_version("9.0.0")
 
 #configfile: "config/config.yaml"
 
@@ -19,7 +20,19 @@ include: "rules/trim.smk"
 print("Unit file path:", config["units"])
 
 ###
-OUTDIR=config["outdir"]+"/"+config['output_folder']+"/"
+OUTDIR = config["outdir"] + "/" + config['output_folder'] + "/"
+
+# Assuming that the pipeline was started from its original directory (as per
+# the README), we store it here for use with the git rule before we change our
+# working directory to the output directory. Otherwise, the git rule fails
+PIPELINE_DIR = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../')
+
+# Setting `workdir` to the output directory makes sure that the .snakemake caching
+# directory is placed in the output direcotry instead of the directory from which
+# the pipeline is launched (usually the git checkout dir), which ensures each
+# analysis has its own caching dir and caches are not stored in an unexpected place
+# (i.e. the pipeline dir) that could fly under the radar and use up loads of storage
+workdir: config['outdir'] + '/' + config['output_folder']
 
 ## sort memory and disk  requirement 
 def get_mem_mb(wildcards, attempt):
@@ -36,7 +49,10 @@ def get_time_180_60(wildcards, attempt):
 
 def get_time_30_120(wildcards, attempt):
     return attempt * 120 + 30
+
 # rules that doesn't require much computational time and power are defied as local rules
+localrules: all, get_version_control
+
 # all the output files should be defined at rule all
 rule all:
     input:
@@ -60,22 +76,29 @@ rule all:
         expand("{OUTDIR}results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
         expand("{OUTDIR}results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
-localrules: all, get_version_control
 rule get_version_control:
     output:
         opj(OUTDIR, "git-version.log")
     shell:
-        "echo git branch: > {output};"
-        "git branch >> {output};"
-        "echo ================================ >> {output};"
-        "echo git log: >> {output};"
-        "git log -1  >> {output};"
-        "echo ================================ >> {output};"
-        "echo git status: >> {output};"
-        "git status >> {output};"
-        "echo ================================ >> {output};"
-        "echo git diff: >> {output};"
-        "git diff  >> {output};"
+        """
+        # switch to the assumed pipeline dir defined earlier in this snakefile
+        cd {PIPELINE_DIR}
+
+        echo git branch: > {output};
+        git branch >> {output};
+        echo ================================ >> {output};
+        echo git log: >> {output};
+        git log -1  >> {output};
+        echo ================================ >> {output};
+        echo git status: >> {output};
+        git status >> {output};
+        echo ================================ >> {output};
+        echo git diff: >> {output};
+        git diff  >> {output};
+
+        # return to original working dir to avoid shenanigans downstream, dump stdout
+        cd - > /dev/null
+        """
 
 rule a_concat_fastq:
     input:
