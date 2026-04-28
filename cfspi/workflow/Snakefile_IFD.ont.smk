@@ -23,8 +23,7 @@ OUTDIR = config['outdir'] + '/' + config['output_folder']
 # Assuming that the pipeline was started from its original directory (as per
 # the README), we store it here for use with the git rule before we change our
 # working directory to the output directory. Otherwise, the git rule fails
-# PIPELINE_DIR = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../')
-PIPELINE_DIR = os.getcwd()
+PIPELINE_DIR = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../')
 
 # Setting `workdir` to the output directory makes sure that the .snakemake caching
 # directory is placed in the output direcotry instead of the directory from which
