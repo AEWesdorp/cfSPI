@@ -2,16 +2,15 @@
 executor: slurm
 default-resources:
   threads: 1
-  slurm_account: compgen
-  slurm_partition: cpu
-slurm-requeue: False
+  slurm_account: None   # CHANGE
+  slurm_partition: None # CHANGE
+slurm-requeue: True
 slurm-status-command: sacct
 
 # Conda stuff
 use-conda: True
 conda-frontend: conda
-conda-prefix: /hpc/compgen/projects/cf-spi/cf-spi/analysis/pvanrijn/snakemake/conda-cache
-# conda-prefix: /path/to/conda/prefix
+conda-prefix: /path/to/dir/for/conda/envs  # CHANGE
 
 # Singularity/Apptainer stuff
 # use-singularity: True
@@ -19,7 +18,7 @@ conda-prefix: /hpc/compgen/projects/cf-spi/cf-spi/analysis/pvanrijn/snakemake/co
 # General stuff
 jobs: 100
 latency-wait: 240
-# restart-times: 3
+restart-times: 3
 keep-going: True
 rerun-incomplete: True
 printshellcmds: True
