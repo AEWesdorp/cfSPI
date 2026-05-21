@@ -57,22 +57,20 @@ rule all:
         # git version
         expand("{OUTDIR}/git-version.log", OUTDIR=OUTDIR),
 
-        #concat_fastq
-        expand("{OUTDIR}/results/raw_fastq/{sample_name}_R1.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-        expand("{OUTDIR}/results/raw_fastq/{sample_name}_R2.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-
         #fastqc
         expand("{OUTDIR}/done/e_fastqc/{sample_name}.done", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #mapping to host 
-        expand("{OUTDIR}/results/host_mapping/{sample_name}_unmapped_host_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/results/host_mapping/{sample_name}_aligned_host_pe.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #kraken output
-        expand("{OUTDIR}/results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report", database=config['database'], k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report",
+               database=config['database'], k2_threshold=config['k2_threshold'],
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #temp additional
-        expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-        expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
 rule get_version_control:
     output:
@@ -109,8 +107,6 @@ rule a_concat_fastq:
         done = touch(opj(OUTDIR, 'done/a_concat_fastq/{sample_name}.done')),
     benchmark:
         opj(OUTDIR, 'benchmark/a_concat_fastq/{sample_name}.tsv'),
-    group:
-        "QC"
     resources:
         mem_mb  = 10000,
         runtime = get_time, 
@@ -118,9 +114,9 @@ rule a_concat_fastq:
     threads: 1
     shell:
         """
-        mkdir -p {OUTDIR}
-        cat {input}/*{sample_name}*R1*.fastq.gz > '{output.R1_raw}';
-        cat {input}/*{sample_name}*R2*.fastq.gz > '{output.R2_raw}';
+        mkdir -p {OUTDIR}/results/tmp
+        cat {input}/*{wildcards.sample_name}*R1*.fastq.gz > '{output.R1_raw}';
+        cat {input}/*{wildcards.sample_name}*R2*.fastq.gz > '{output.R2_raw}';
         echo $(zcat '{output.R1_raw}' | wc -l) / 4 | bc > '{output.stats_R1}';
         echo $(zcat '{output.R2_raw}' | wc -l) / 4 | bc > '{output.stats_R2}';
         """
@@ -138,8 +134,6 @@ rule b_unique_nubeam:
     priority: 46
     benchmark:
         opj(OUTDIR, 'benchmark/b_unique_nubeam/{sample_name}.tsv'),
-    group:
-        "QC"
     threads: 1
     resources:
         mem_mb  = get_mem_mb,
@@ -172,13 +166,11 @@ rule c_fastp:
         json = opj(OUTDIR, 'reports/fastp/{sample_name}_fastp.json'),
         failed = temp(opj(OUTDIR, 'results/tmp/fastp_{sample_name}.fastq.gz')),
         done = touch(opj(OUTDIR, 'done/c_fastp/{sample_name}.done')),
-    group:
-        "QC"
     priority: 47
     resources:
-        mem_mb  = 10000,
-        runtime = get_time_30_120,
-        disk_mb = 12000, 
+        mem_mb_per_cpu  = 2000,
+        runtime         = get_time_30_120,
+        disk_mb         = 12000, 
     log:
         log = opj(OUTDIR, 'log/c_fastp/{sample_name}.log'),
     threads: 16
@@ -215,8 +207,6 @@ rule d_adapter_removal:
         settings = opj(OUTDIR, 'reports/adapter_removal/{sample_name}_adapter_removal_settings.txt'),
         discarded = temp(opj(OUTDIR, 'results/tmp/{sample_name}_trimmed_discarded.fastq.gz')),
         done = touch(opj(OUTDIR, 'done/d_adapter_removal/{sample_name}.done')),
-    group:
-        "QC"
     priority: 48
     log:
         log = opj(OUTDIR, 'log/d_adapter_removal/{sample_name}.log'),
@@ -228,9 +218,9 @@ rule d_adapter_removal:
         adapter_R2 = get_adapter_R2,
         base_name = "{sample_name}"
     resources:
-        mem_mb  = get_mem_mb,
-        runtime = 90,
-        disk_mb = get_disk_mb, 
+        mem_mb_per_cpu = 4000,
+        runtime        = 90,
+        disk_mb        = get_disk_mb, 
     threads: 16
     conda:
         "envs/adapter_removal.yaml"
@@ -251,12 +241,13 @@ rule d_adapter_removal:
             --adapter2 {params.adapter_R2} \
             --output1 {output.R1_truncated} \
             --output2 {output.R2_truncated} \
+            --gzip \
             --singleton {output.singleton} \
             --discarded {output.discarded} \
             --settings {output.settings} 2>&1 > {log.log};
 
-        echo $(zcat {output.R1_truncated} | wc -l )/4 | bc > {output.stats_R1};
-        echo $(zcat {output.R2_truncated} | wc -l )/4 | bc > {output.stats_R2};
+        echo $(zcat {output.R1_truncated} | wc -l) / 4 | bc > {output.stats_R1};
+        echo $(zcat {output.R2_truncated} | wc -l) / 4 | bc > {output.stats_R2};
         """
 
 rule e_fastqc:
@@ -268,15 +259,13 @@ rule e_fastqc:
     output:
         fastqc_dir = directory(opj(OUTDIR, 'reports/fastqc/{sample_name}')),
         done = touch(opj(OUTDIR, 'done/e_fastqc/{sample_name}.done')),
-    group:
-        "QC"
     priority: 1
     log:
         log = opj(OUTDIR, 'log/e_fastqc/{sample_name}.log'),
     resources:
-        mem_mb  = 30000,
-        runtime = get_time, 
-        disk_mb = 30000, 
+        mem_mb_per_cpu  = 2000,
+        runtime         = get_time, 
+        disk_mb         = 30000, 
     threads: 16
     benchmark:
         opj(OUTDIR, 'benchmark/e_fastqc/{sample_name}.tsv'),
@@ -284,23 +273,23 @@ rule e_fastqc:
         "envs/fastqc.yaml"
     shell:
         """
-        mkdir -p {fastqc_dir}
+        mkdir -p {output.fastqc_dir}
         fastqc \
             -t {threads} \
-            -o {fastqc_dir} \
+            -o {output.fastqc_dir} \
             {input.R1_raw} 2>&1 > {log.log};
         fastqc \
             -t {threads} \
-            -o {fastqc_dir} \
+            -o {output.fastqc_dir} \
             {input.R2_raw} 2>&1 > {log.log};
 
         fastqc \
             -t {threads} \
-            -o {fastqc_dir} \
+            -o {output.fastqc_dir} \
             {input.R1_truncated} 2>&1 > {log.log};
         fastqc \
             -t {threads} \
-            -o {fastqc_dir} \
+            -o {output.fastqc_dir} \
             {input.R2_truncated} 2>&1 > {log.log};
         """
 
@@ -310,7 +299,7 @@ rule f_host_mapping:
         R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
     output:
         host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_host_pe.sam')),
-        host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_host_pe.bam')),
+        host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}_aligned_host_pe.bam'),
         host_unmpd_r1 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
         host_unmpd_r2 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
@@ -325,9 +314,9 @@ rule f_host_mapping:
     conda:
         "envs/mapping.yaml"
     resources:
-        mem_mb  = 10000,
-        runtime = 2400,
-        disk_mb = 10000,
+        mem_mb_per_cpu = 2000,
+        runtime        = 2400,
+        disk_mb        = 10000,
     shell:
         """
         bowtie2 \
@@ -342,7 +331,8 @@ rule f_host_mapping:
             -o {output.host_bam};
 
         samtools bam2fq \
-            -f 12 {output.host_bam} \
+            -f 12 \
+            {output.host_bam} \
             -1 {output.host_unmpd_r1} \
             -2 {output.host_unmpd_r2};
 
@@ -358,9 +348,9 @@ rule g_kraken2:
         db = config['database_dir'] + '/' + '{database}',
         threshold = '{k2_threshold}', 
     output:
-        k2_report_hm = opj(OUTDIR, 'results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report'),
-        k2_output_hm = temp(opj(OUTDIR, 'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output')),
-        k2_output_class_hm = opj(OUTDIR, 'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
+        k2_report_hm = opj(OUTDIR, 'results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report'),
+        k2_output_hm = temp(opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output')),
+        k2_output_class_hm = opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
         done = touch(opj(OUTDIR, 'done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done')),
     priority: 50
     resources:
