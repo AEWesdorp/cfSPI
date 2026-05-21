@@ -67,6 +67,7 @@ rule all:
         # fastqc
         expand('{OUTDIR}/done/d_fastqc/{sample_name}.done', sample_name=units['sample_name'], OUTDIR=OUTDIR),
         # mapping to host 
+        expand('{OUTDIR}/results/host_mapping/{sample_name}_aligned_host.bam', sample_name=units['sample_name'], OUTDIR=OUTDIR)
         expand('{OUTDIR}/results/host_mapping/{sample_name}_unmapped_host.fastq.gz', sample_name=units['sample_name'],
                OUTDIR=OUTDIR),
         # kraken output
@@ -220,7 +221,7 @@ rule e_host_mapping:
     input:
         fq_trimmed = rules.c_fastplong.output.fq_trimmed, 
     output:
-        host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_host.bam')),
+        host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}_aligned_host.bam'),
         host_unmapped = opj(OUTDIR,'results/host_mapping/{sample_name}_unmapped_host.fastq.gz'),
         fq_stats = opj(OUTDIR,'results/stats/{sample_name}_05_GRCh38_host_mapp_fastq.txt'),
         done = touch(opj(OUTDIR,'done/e_host_mapping/{sample_name}.done')),
