@@ -1,10 +1,9 @@
 # Main pipeline
 # Specify snakemake version
-from snakemake.utils import min_version
+import os
 from os.path import join as opj
-min_version("6.3.0")
-
-#configfile: "config/config.yaml"
+from snakemake.utils import min_version
+min_version("9.0.0")
 
 # This defines the sample name should never contain underscore to avoid confusing rule determination.
 wildcard_constraints:
@@ -18,8 +17,20 @@ include: "rules/trim.smk"
 
 print("Unit file path:", config["units"])
 
-###
-OUTDIR=config["outdir"]+"/"+config['output_folder']+"/"
+# output directory used to store all results
+OUTDIR = config["outdir"] + "/" + config['output_folder']
+
+# Assuming that the pipeline was started from its original directory (as per
+# the README), we store it here for use with the git rule before we change our
+# working directory to the output directory. Otherwise, the git rule fails
+PIPELINE_DIR = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../')
+
+# Setting `workdir` to the output directory makes sure that the .snakemake caching
+# directory is placed in the output direcotry instead of the directory from which
+# the pipeline is launched (usually the git checkout dir), which ensures each
+# analysis has its own caching dir and caches are not stored in an unexpected place
+# (i.e. the pipeline dir) that could fly under the radar and use up loads of storage
+workdir: config['outdir'] + '/' + config['output_folder']
 
 ## sort memory and disk  requirement 
 def get_mem_mb(wildcards, attempt):
@@ -36,270 +47,294 @@ def get_time_180_60(wildcards, attempt):
 
 def get_time_30_120(wildcards, attempt):
     return attempt * 120 + 30
+
 # rules that doesn't require much computational time and power are defied as local rules
+localrules: all, get_version_control
+
 # all the output files should be defined at rule all
 rule all:
     input:
         # git version
-        expand("{OUTDIR}git-version.log", OUTDIR=OUTDIR),
-
-        #concat_fastq
-        expand("{OUTDIR}results/raw_fastq/{sample_name}_R1.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-        expand("{OUTDIR}results/raw_fastq/{sample_name}_R2.fastq.gz", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/git-version.log", OUTDIR=OUTDIR),
 
         #fastqc
-        expand("{OUTDIR}done/e_fastqc/{sample_name}.done", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/done/e_fastqc/{sample_name}.done", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #mapping to host 
-        expand("{OUTDIR}results/host_mapping/{sample_name}_unmapped_host_r1.fq", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/results/host_mapping/{sample_name}_aligned_host_pe.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #kraken output
-        expand("{OUTDIR}results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report", database=config['database'], k2_threshold=config['k2_threshold'], sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report",
+               database=config['database'], k2_threshold=config['k2_threshold'],
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #temp additional
-        expand("{OUTDIR}results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
-        expand("{OUTDIR}results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # expand("{OUTDIR}/results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt", sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
-localrules: all, get_version_control
 rule get_version_control:
     output:
         opj(OUTDIR, "git-version.log")
     shell:
-        "echo git branch: > {output};"
-        "git branch >> {output};"
-        "echo ================================ >> {output};"
-        "echo git log: >> {output};"
-        "git log -1  >> {output};"
-        "echo ================================ >> {output};"
-        "echo git status: >> {output};"
-        "git status >> {output};"
-        "echo ================================ >> {output};"
-        "echo git diff: >> {output};"
-        "git diff  >> {output};"
+        """
+        # switch to the assumed pipeline dir defined earlier in this snakefile
+        cd {PIPELINE_DIR}
+
+        echo git branch: > {output};
+        git branch >> {output};
+        echo ================================ >> {output};
+        echo git log: >> {output};
+        git log -1  >> {output};
+        echo ================================ >> {output};
+        echo git status: >> {output};
+        git status >> {output};
+        echo ================================ >> {output};
+        echo git diff: >> {output};
+        git diff  >> {output};
+
+        # return to original working dir to avoid shenanigans downstream, dump stdout
+        cd - > /dev/null
+        """
 
 rule a_concat_fastq:
     input:
         get_fq
     output:
-        R1_raw=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1.fastq')),
-        R2_raw=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2.fastq')),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_01_raw_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_01_raw_fastq.txt'),
-
-        R1_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R1.fastq.gz')),
-        R2_raw_gz=opj(opj(OUTDIR,'results/raw_fastq/{sample_name}_R2.fastq.gz')),
-
-        done=touch(opj(OUTDIR,"done/a_concat_fastq/{sample_name}.done")),
+        R1_raw = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1.fastq.gz')),
+        R2_raw = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2.fastq.gz')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_01_raw_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_01_raw_fastq.txt'),
+        done = touch(opj(OUTDIR, 'done/a_concat_fastq/{sample_name}.done')),
     benchmark:
-        opj(OUTDIR,"benchmark/a_concat_fastq/{sample_name}.tsv"),
-    group:
-        "QC"
+        opj(OUTDIR, 'benchmark/a_concat_fastq/{sample_name}.tsv'),
     resources:
-        mem_mb = 10000,
-        runtime_min = get_time,
-        cpus = 1, 
+        mem_mb  = 10000,
+        runtime = get_time, 
         disk_mb = 12000, 
     threads: 1
     shell:
         """
-        mkdir -p {OUTDIR}
-        zcat {input}/*R1*.fastq.gz > '{output.R1_raw}';
-        zcat {input}/*R2*.fastq.gz > '{output.R2_raw}';
-        echo $(cat {output.R1_raw} | wc -l )/4 | bc > '{output.stats_R1}';
-        echo $(cat {output.R2_raw} | wc -l )/4 | bc > '{output.stats_R2}';
-        gzip -c {output.R1_raw} > {output.R1_raw_gz};
-        gzip -c {output.R2_raw} > {output.R2_raw_gz};
+        mkdir -p {OUTDIR}/results/tmp
+        cat {input}/*{wildcards.sample_name}*R1*.fastq.gz > '{output.R1_raw}';
+        cat {input}/*{wildcards.sample_name}*R2*.fastq.gz > '{output.R2_raw}';
+        echo $(zcat '{output.R1_raw}' | wc -l) / 4 | bc > '{output.stats_R1}';
+        echo $(zcat '{output.R2_raw}' | wc -l) / 4 | bc > '{output.stats_R2}';
         """
 
 rule b_unique_nubeam:
     input:
-        R1_raw=rules.a_concat_fastq.output.R1_raw,
-        R2_raw=rules.a_concat_fastq.output.R2_raw,
+        R1_raw = rules.a_concat_fastq.output.R1_raw,
+        R2_raw = rules.a_concat_fastq.output.R2_raw,
     output:
-        R1_nubeam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_uniq.fastq')),   
-        R2_nubeam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2_uniq.fastq')),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
-
-        done=touch(opj(OUTDIR,"done/b_unique_nubeam/{sample_name}.done")),
+        R1_nubeam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_uniq.fastq.gz')),   
+        R2_nubeam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2_uniq.fastq.gz')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
+        done = touch(opj(OUTDIR, 'done/b_unique_nubeam/{sample_name}.done')),
     priority: 46
     benchmark:
-        opj(OUTDIR,"benchmark/b_unique_nubeam/{sample_name}.tsv"),
-    group:
-        "QC"
+        opj(OUTDIR, 'benchmark/b_unique_nubeam/{sample_name}.tsv'),
+    threads: 1
     resources:
-        mem_mb = get_mem_mb,
-        runtime_min = 21600,
-        cpus = 1, 
-        disk_mb = 12000, 
+        mem_mb  = get_mem_mb,
+        runtime = 360,
+        disk    = 12000, 
     log:
         log=opj(OUTDIR,"log/b_unique_nubeam/{sample_name}.log"),
     shell:
         """
-        ./resources/nubeam-dedup -i1 {input.R1_raw} -i2 {input.R2_raw} -o1 {output.R1_nubeam} -o2 {output.R2_nubeam} -s 1 -r 0 2>&1 > {log.log};
+        {PIPELINE_DIR}/resources/nubeam-dedup \
+            -i1 {input.R1_raw} \
+            -i2 {input.R2_raw} \
+            -o1 {output.R1_nubeam} \
+            -o2 {output.R2_nubeam} -s 1 -r 0 2>&1 > {log.log};
 
-        echo $(cat {output.R1_nubeam}| wc -l )/4 | bc > '{output.stats_R1}';
-        echo $(cat {output.R2_nubeam}| wc -l )/4 | bc > '{output.stats_R2}';
+        echo $(zcat {output.R1_nubeam}| wc -l )/4 | bc > '{output.stats_R1}';
+        echo $(zcat {output.R2_nubeam}| wc -l )/4 | bc > '{output.stats_R2}';
         """
 
 rule c_fastp:
     input:
-        R1_nubeam=rules.b_unique_nubeam.output.R1_nubeam,
-        R2_nubeam=rules.b_unique_nubeam.output.R2_nubeam,
+        R1_nubeam = rules.b_unique_nubeam.output.R1_nubeam,
+        R2_nubeam = rules.b_unique_nubeam.output.R2_nubeam,
     output:
-        R1_trimmed=temp(opj(OUTDIR,"results/tmp/{sample_name}_R1_trimmed.fastq")),
-        R2_trimmed=temp(opj(OUTDIR,"results/tmp/{sample_name}_R2_trimmed.fastq")),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
-
-        html=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.html"),
-        json=opj(OUTDIR,"reports/fastp/{sample_name}_fastp.json"),
-        failed=temp(opj(OUTDIR,"results/tmp/fastp_{sample_name}.fastq")),
-
-        done=touch(opj(OUTDIR,"done/c_fastp/{sample_name}.done")),
-    group:
-        "QC"
+        R1_trimmed = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_trimmed.fastq.gz')),
+        R2_trimmed = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2_trimmed.fastq.gz')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_03_fastp_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_03_fastp_fastq.txt'),
+        html = opj(OUTDIR, 'reports/fastp/{sample_name}_fastp.html'),
+        json = opj(OUTDIR, 'reports/fastp/{sample_name}_fastp.json'),
+        failed = temp(opj(OUTDIR, 'results/tmp/fastp_{sample_name}.fastq.gz')),
+        done = touch(opj(OUTDIR, 'done/c_fastp/{sample_name}.done')),
     priority: 47
     resources:
-        mem_mb = 10000,
-        runtime_min = get_time_30_120,
-        cpus = 16, 
-        disk_mb = 12000, 
+        mem_mb_per_cpu  = 2000,
+        runtime         = get_time_30_120,
+        disk_mb         = 12000, 
     log:
-        log=opj(OUTDIR,"log/c_fastp/{sample_name}.log"),
+        log = opj(OUTDIR, 'log/c_fastp/{sample_name}.log'),
     threads: 16
     benchmark:
-        opj(OUTDIR,"benchmark/c_fastp/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/c_fastp/{sample_name}.tsv'),
     conda:
         "envs/fastp.yaml"
     shell:
         """
-        fastp --thread {threads} --in1 {input.R1_nubeam} --in2 {input.R2_nubeam} --out1 {output.R1_trimmed} --out2 {output.R2_trimmed} \
-        --failed_out {output.failed} -h {output.html} -j {output.json} 2>&1 > {log.log};
+        fastp \
+            --thread {threads} \
+            --in1 {input.R1_nubeam} \
+            --in2 {input.R2_nubeam} \
+            --out1 {output.R1_trimmed} \
+            --out2 {output.R2_trimmed} \
+            --failed_out {output.failed} \
+            -h {output.html} \
+            -j {output.json} 2>&1 > {log.log};
 
-        echo $(cat {output.R1_trimmed} | wc -l )/4 | bc  > '{output.stats_R1}';
-        echo $(cat {output.R2_trimmed} | wc -l )/4 | bc  > '{output.stats_R2}';
+        echo $(zcat {output.R1_trimmed} | wc -l )/4 | bc  > '{output.stats_R1}';
+        echo $(zcat {output.R2_trimmed} | wc -l )/4 | bc  > '{output.stats_R2}';
         """
 
 rule d_adapter_removal:
     input:
-        R1_trimmed=rules.c_fastp.output.R1_trimmed,
-        R2_trimmed=rules.c_fastp.output.R2_trimmed
+        R1_trimmed = rules.c_fastp.output.R1_trimmed,
+        R2_trimmed = rules.c_fastp.output.R2_trimmed,
     output:
-        singleton=temp(opj(OUTDIR,"results/tmp/{sample_name}_singleton_trimmed_truncated")),
-        R1_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq')),
-        R2_truncated=temp(opj(OUTDIR,'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq')),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_04_adapt_remov_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_04_adapt_remov_fastq.txt'),
-
-        settings=opj(OUTDIR,"reports/adapter_removal/{sample_name}_adapter_removal_settings.txt"),
-        discarded=temp(opj(OUTDIR,"results/tmp/{sample_name}_trimmed_discarded.fastq")),
-        done=touch(opj(OUTDIR,"done/d_adapter_removal/{sample_name}.done")),
-
-    group:
-        "QC"
+        singleton = temp(opj(OUTDIR, 'results/tmp/{sample_name}_singleton_trimmed_truncated.fastq.gz')),
+        R1_truncated = temp(opj(OUTDIR, 'results/clean_fastq/{sample_name}_R1_trimmed_truncated.fastq.gz')),
+        R2_truncated = temp(opj(OUTDIR, 'results/clean_fastq/{sample_name}_R2_trimmed_truncated.fastq.gz')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_04_adapt_remov_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_04_adapt_remov_fastq.txt'),
+        settings = opj(OUTDIR, 'reports/adapter_removal/{sample_name}_adapter_removal_settings.txt'),
+        discarded = temp(opj(OUTDIR, 'results/tmp/{sample_name}_trimmed_discarded.fastq.gz')),
+        done = touch(opj(OUTDIR, 'done/d_adapter_removal/{sample_name}.done')),
     priority: 48
     log:
-        log=opj(OUTDIR,"log/d_adapter_removal/{sample_name}.log"),
+        log = opj(OUTDIR, 'log/d_adapter_removal/{sample_name}.log'),
     params:
-        mq = config['adapter_removal']['minquality'],
+        mq   = config['adapter_removal']['minquality'],
         tmns = config['adapter_removal']['trimns'],
-        ml = config['k_mer_length'],
+        ml   = config['k_mer_length'],
         adapter_R1 = get_adapter_R1,
         adapter_R2 = get_adapter_R2,
         base_name = "{sample_name}"
     resources:
-        mem_mb = get_mem_mb,
-        runtime_min = 4800,
-        cpus = 16,
-        disk_mb = get_disk_mb, 
+        mem_mb_per_cpu = 4000,
+        runtime        = 90,
+        disk_mb        = get_disk_mb, 
     threads: 16
     conda:
         "envs/adapter_removal.yaml"
     benchmark:
-        opj(OUTDIR,"benchmark/d_adapter_removal/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/d_adapter_removal/{sample_name}.tsv'),
     shell:
         """
-        AdapterRemoval --threads {threads} --file1 {input.R1_trimmed} --file2 {input.R2_trimmed} --basename {params.base_name} --minlength {params.ml} --trimqualities --minquality {params.mq} {params.tmns} --adapter1 {params.adapter_R1} --adapter2 {params.adapter_R2} \
-        --output1 {output.R1_truncated} --output2 {output.R2_truncated} --singleton {output.singleton} --discarded {output.discarded} --settings {output.settings} 2>&1 > {log.log};
+        AdapterRemoval \
+            --threads {threads} \
+            --file1 {input.R1_trimmed} \
+            --file2 {input.R2_trimmed} \
+            --basename {params.base_name} \
+            --minlength {params.ml} \
+            --trimqualities \
+            --minquality {params.mq} \
+            {params.tmns} \
+            --adapter1 {params.adapter_R1} \
+            --adapter2 {params.adapter_R2} \
+            --output1 {output.R1_truncated} \
+            --output2 {output.R2_truncated} \
+            --gzip \
+            --singleton {output.singleton} \
+            --discarded {output.discarded} \
+            --settings {output.settings} 2>&1 > {log.log};
 
-        echo $(cat {output.R1_truncated} | wc -l )/4 | bc > {output.stats_R1};
-        echo $(cat {output.R2_truncated} | wc -l )/4 | bc > {output.stats_R2};
+        echo $(zcat {output.R1_truncated} | wc -l) / 4 | bc > {output.stats_R1};
+        echo $(zcat {output.R2_truncated} | wc -l) / 4 | bc > {output.stats_R2};
         """
 
 rule e_fastqc:
     input:
-        R1_raw=rules.a_concat_fastq.output.R1_raw,
-        R2_raw=rules.a_concat_fastq.output.R2_raw,
-        R1_truncated=rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated=rules.d_adapter_removal.output.R2_truncated,
+        R1_raw = rules.a_concat_fastq.output.R1_raw,
+        R2_raw = rules.a_concat_fastq.output.R2_raw,
+        R1_truncated = rules.d_adapter_removal.output.R1_truncated,
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,
     output:
-        done=touch(opj(OUTDIR,"done/e_fastqc/{sample_name}.done")),
-    group:
-        "QC"
+        fastqc_dir = directory(opj(OUTDIR, 'reports/fastqc/{sample_name}')),
+        done = touch(opj(OUTDIR, 'done/e_fastqc/{sample_name}.done')),
     priority: 1
     log:
-        log=opj(OUTDIR,"log/e_fastqc/{sample_name}.log"),
-    params:
-        out_dir=opj(OUTDIR,"reports/fastqc/"),
+        log = opj(OUTDIR, 'log/e_fastqc/{sample_name}.log'),
     resources:
-        mem_mb = 30000,
-        runtime_min = 3600, 
-        cpus = 16, 
-        disk_mb = 30000, 
-    threads: 1
+        mem_mb_per_cpu  = 2000,
+        runtime         = get_time, 
+        disk_mb         = 30000, 
+    threads: 16
     benchmark:
-        opj(OUTDIR,"benchmark/e_fastqc/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/e_fastqc/{sample_name}.tsv'),
     conda:
         "envs/fastqc.yaml"
     shell:
         """
-        mkdir -p {params.out_dir}
-        fastqc -t 1 -o {params.out_dir} {input.R1_raw} 2>&1 > {log.log};
-        fastqc -t 1 -o {params.out_dir} {input.R2_raw} 2>&1 > {log.log};
+        mkdir -p {output.fastqc_dir}
+        fastqc \
+            -t {threads} \
+            -o {output.fastqc_dir} \
+            {input.R1_raw} 2>&1 > {log.log};
+        fastqc \
+            -t {threads} \
+            -o {output.fastqc_dir} \
+            {input.R2_raw} 2>&1 > {log.log};
 
-        fastqc -t 1 -o {params.out_dir} {input.R1_truncated} 2>&1 > {log.log};
-        fastqc -t 1 -o {params.out_dir} {input.R2_truncated} 2>&1 > {log.log};
+        fastqc \
+            -t {threads} \
+            -o {output.fastqc_dir} \
+            {input.R1_truncated} 2>&1 > {log.log};
+        fastqc \
+            -t {threads} \
+            -o {output.fastqc_dir} \
+            {input.R2_truncated} 2>&1 > {log.log};
         """
 
 rule f_host_mapping:
     input:
-        R1_truncated=rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated=rules.d_adapter_removal.output.R2_truncated,   
+        R1_truncated = rules.d_adapter_removal.output.R1_truncated,
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
     output:
-        host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_host_pe.sam')),
-        host_bam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_host_pe.bam')),
-
-        host_unmpd_r1=opj(OUTDIR,'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
-        host_unmpd_r2=opj(OUTDIR,'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
-
-        done=touch(opj(OUTDIR,"done/f_host_mapping/{sample_name}.done")),
+        host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_host_pe.sam')),
+        host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}_aligned_host_pe.bam'),
+        host_unmpd_r1 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
+        host_unmpd_r2 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
+        done = touch(opj(OUTDIR, 'done/f_host_mapping/{sample_name}.done')),
     priority: 49
     params:
-        reference=config["reference_genome"]+"/"+config["reference_genome"],
+        reference = config['reference_genome_dir'] + '/' + config['reference_genome'],
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/f_host_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/f_host_mapping/{sample_name}.tsv'),
     conda:
         "envs/mapping.yaml"
     resources:
-        mem_mb = 10000,
-        runtime_min = 2400,
-        cpus = 32,
-        disk_mb = 10000,
+        mem_mb_per_cpu = 2000,
+        runtime        = 2400,
+        disk_mb        = 10000,
     shell:
         """
-        bowtie2 -p {threads} -x {params.reference} -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
-        samtools view -b {output.host_sam} -o {output.host_bam};
+        bowtie2 \
+            -p {threads} \
+            -x {params.reference} \
+            -1 {input.R1_truncated} \
+            -2 {input.R2_truncated} > {output.host_sam};
+        
+        samtools view \
+            --threads {threads} \
+            -b {output.host_sam} \
+            -o {output.host_bam};
 
-        samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
+        samtools bam2fq \
+            -f 12 \
+            {output.host_bam} \
+            -1 {output.host_unmpd_r1} \
+            -2 {output.host_unmpd_r2};
 
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};
@@ -310,65 +345,78 @@ rule g_kraken2:
         unm_r1 = rules.f_host_mapping.output.host_unmpd_r1,
         unm_r2 = rules.f_host_mapping.output.host_unmpd_r2,
     params:
-        db = config["database"]+"/"+"{database}",
-        threshold="{k2_threshold}", 
+        db = config['database_dir'] + '/' + '{database}',
+        threshold = '{k2_threshold}', 
     output:
-        k2_report_hm=opj(OUTDIR,'results/kraken2_report/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.report'),
-        k2_output_hm=temp(opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output')),
-        k2_output_class_hm=opj(OUTDIR,'results/kraken2_output/after_host_mapping/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
-
-        done=touch(opj(OUTDIR,"done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done")),
+        k2_report_hm = opj(OUTDIR, 'results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report'),
+        k2_output_hm = temp(opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output')),
+        k2_output_class_hm = opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
+        done = touch(opj(OUTDIR, 'done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done')),
     priority: 50
     resources:
-        mem_mb = 128000,
-        runtime_min = 60,
-        cpus = 16,
+        mem_mb  = 128000,
+        runtime = 60,
         disk_mb = 128000,
     threads: 16
     benchmark:
-        opj(OUTDIR,"benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv"),
+        opj(OUTDIR, 'benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv'),
     conda:
         "envs/kraken.yaml"
     shell:
         """
-        kraken2 --confidence {params.threshold} --db {params.db} --threads {threads} \
-        --report-zero-counts --report-minimizer-data \
-        --output {output.k2_output_hm} --report {output.k2_report_hm} --paired {input.unm_r1} {input.unm_r2};
+        kraken2 \
+            --confidence {params.threshold} \
+            --db {params.db} \
+            --threads {threads} \
+            --report-zero-counts \
+            --report-minimizer-data \
+            --output {output.k2_output_hm} \
+            --report {output.k2_report_hm} \
+            --paired {input.unm_r1} {input.unm_r2};
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
 
 rule ff_chm13_mapping:
     input:
-        R1_truncated=rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated=rules.d_adapter_removal.output.R2_truncated,   
+        R1_truncated = rules.d_adapter_removal.output.R1_truncated,
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
     output:
-        host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_chm13_pe.sam')),
-        host_bam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_chm13_pe.bam')),
-
-        host_unmpd_r1=temp(opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq')),
-        host_unmpd_r2=temp(opj(OUTDIR,'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq')),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_XX_chm13_mapp_fastq.txt'),
+        host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_chm13_pe.sam')),
+        host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_chm13_pe.bam')),
+        host_unmpd_r1 = temp(opj(OUTDIR, 'results/chm13_mapping/{sample_name}_unmapped_chm13_r1.fq')),
+        host_unmpd_r2 = temp(opj(OUTDIR, 'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_chm13_mapp_fastq.txt'),
     priority: 200
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/ff_chm13_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/ff_chm13_mapping/{sample_name}.tsv'),
     params:
-        ref_genome=config['reference_genome']+"/",
+        ref_genome_dir = config['reference_genome_dir'],
     conda:
         "envs/mapping.yaml"
     resources:
-        mem_mb = 10000,
-        runtime_min = 2400,
-        cpus = 32,
+        mem_mb  = 10000,
+        runtime = 2400,
         disk_mb = 10000,
     shell:
         """
-        bowtie2 -p {threads} -x {params.ref_genome}chm13v2.0 -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
-        samtools view -b {output.host_sam} -o {output.host_bam};
+        bowtie2 \
+            -p {threads} \
+            -x {params.ref_genome_dir}/chm13v2.0 \
+            -1 {input.R1_truncated} \
+            -2 {input.R2_truncated} > {output.host_sam};
+        
+        samtools view \
+            --threads {threads} \
+            -b {output.host_sam} \
+            -o {output.host_bam};
 
-        samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
+        samtools bam2fq \
+            --threads {threads} \
+            -f 12 {output.host_bam} \
+            -1 {output.host_unmpd_r1} \
+            -2 {output.host_unmpd_r2};
  
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};
@@ -376,35 +424,45 @@ rule ff_chm13_mapping:
 
 rule ff_grch38_mapping:
     input:
-        R1_truncated=rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated=rules.d_adapter_removal.output.R2_truncated,   
+        R1_truncated = rules.d_adapter_removal.output.R1_truncated,
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
     output:
-        host_sam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_grch38_pe.sam')),
-        host_bam=temp(opj(OUTDIR, 'results/tmp/{sample_name}_alligned_grch38_pe.bam')),
-
-        host_unmpd_r1=temp(opj(OUTDIR,'results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq')),
-        host_unmpd_r2=temp(opj(OUTDIR,'results/grch38_mapping/{sample_name}_unmapped_grch38_r2.fq')),
-
-        stats_R1=opj(OUTDIR,'results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt'),
-        stats_R2=opj(OUTDIR,'results/stats/{sample_name}_R2_XX_grch38_mapp_fastq.txt'),
+        host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_grch38_pe.sam')),
+        host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_grch38_pe.bam')),
+        host_unmpd_r1 = temp(opj(OUTDIR, 'results/grch38_mapping/{sample_name}_unmapped_grch38_r1.fq')),
+        host_unmpd_r2 = temp(opj(OUTDIR, 'results/grch38_mapping/{sample_name}_unmapped_grch38_r2.fq')),
+        stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt'),
+        stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_grch38_mapp_fastq.txt'),
     priority: 200
     threads: 32
     benchmark:
-        opj(OUTDIR,"benchmark/ff_grch38_mapping/{sample_name}.tsv"),
+        opj(OUTDIR, 'benchmark/ff_grch38_mapping/{sample_name}.tsv'),
     params:
-        ref_genome=config['reference_genome']+"/",
+        ref_genome_dir = config['reference_genome_dir'],
     conda:
         "envs/mapping.yaml"
     resources:
-        mem_mb = 10000,
-        runtime_min = 2400,
-        cpus = 32,
+        mem_mb  = 10000,
+        runtime = 2400,
         disk_mb = 10000,
     shell:
         """
-        bowtie2 -p {threads} -x {params.ref_genome}GCF_000001405.40_GRCh38.p14_genomic -1 {input.R1_truncated} -2 {input.R2_truncated} > {output.host_sam};
-        samtools view -b {output.host_sam} -o {output.host_bam};
-        samtools bam2fq -f 12 {output.host_bam} -1 {output.host_unmpd_r1} -2 {output.host_unmpd_r2};
+        bowtie2 \
+            -p {threads} \
+            -x {params.ref_genome_dir}/GCF_000001405.40_GRCh38.p14_genomic \
+            -1 {input.R1_truncated} \
+            -2 {input.R2_truncated} > {output.host_sam};
+        
+        samtools view \
+            --threads {threads}
+            -b {output.host_sam} \
+            -o {output.host_bam};
+        
+        samtools bam2fq \
+            --threads {threads} \
+            -f 12 {output.host_bam} \
+            -1 {output.host_unmpd_r1} \
+            -2 {output.host_unmpd_r2};
 
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};

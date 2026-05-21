@@ -16,13 +16,18 @@ reference_genome: chm13v2.0_PLUS_GCF_000001405.40_GRCh38.p14_genomic
 reference_genome_dir: /example/name/host_genome/directory/
 
 database: [EPRSc2]
-
 database_dir: /example/database/directory/
 
-k2_threshold: [0.4] #if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+# if you want to run diverse thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+k2_threshold: [0.4]
 
 ############################################ DO NOT MODIFY ############################################
-# adapters
+# adapter files
+file_srsly: ./resources/adapter_indexes/SRSLY_index.txt
+file_idt384umi: ./resources/adapter_indexes/IDT384UMI_index.txt
+file_kapa: ./resources/adapter_indexes/KAPA_index.txt
+
+# adapter sequences
 # https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
 KAPA_single_index:
   adapterP7_part1: GATCGGAAGAGCACACGTCTGAACTCCAGTCAC

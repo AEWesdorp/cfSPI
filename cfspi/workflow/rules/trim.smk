@@ -1,3 +1,6 @@
+import os
+import pandas as pd
+
 # unit name = unique name?
 units = (
     pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "library_prep": str})
@@ -5,20 +8,25 @@ units = (
     .sort_index()
 )
 
+base = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../../')
+path_srsly     = os.path.normpath(config['file_srsly'])
+path_idt384umi = os.path.normpath(config['file_idt384umi'])
+path_kapa      = os.path.normpath(config['file_kapa'])
+
 SRSLY_index = (
-    pd.read_csv("resources/adapter_indexes/SRSLY_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(f'{base}/{path_srsly}', sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
 
 IDT384UMI_index = (
-    pd.read_csv("resources/adapter_indexes/IDT384UMI_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(f'{base}/{path_idt384umi}', sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
 
 KAPA_index = (
-    pd.read_csv("resources/adapter_indexes/KAPA_index.txt", sep="\t", dtype={"name": str})
+    pd.read_csv(f'{base}/{path_kapa}', sep="\t", dtype={"name": str})
     .set_index(["name"], drop=False)
     .sort_index()
 )
