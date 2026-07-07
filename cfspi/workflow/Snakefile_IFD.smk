@@ -48,6 +48,9 @@ def get_time_180_60(wildcards, attempt):
 def get_time_30_120(wildcards, attempt):
     return attempt * 120 + 30
 
+def get_mem_mb_per_cpu(wildcards, attempt):
+    return attempt * 4000
+
 # rules that doesn't require much computational time and power are defied as local rules
 localrules: all, get_version_control
 
@@ -218,7 +221,7 @@ rule d_adapter_removal:
         adapter_R2 = get_adapter_R2,
         base_name = "{sample_name}"
     resources:
-        mem_mb_per_cpu = 4000,
+        mem_mb_per_cpu = get_mem_mb_per_cpu,
         runtime        = 90,
         disk_mb        = get_disk_mb, 
     threads: 16
