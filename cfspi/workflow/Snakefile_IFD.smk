@@ -301,10 +301,10 @@ rule f_host_mapping:
         R1_truncated = rules.d_adapter_removal.output.R1_truncated,
         R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
     output:
-        host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_host_pe.sam')),
-        host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}_aligned_host_pe.bam'),
-        host_unmpd_r1 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r1.fq'),
-        host_unmpd_r2 = opj(OUTDIR, 'results/host_mapping/{sample_name}_unmapped_host_r2.fq'),
+        host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}.host.sam')),
+        host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}.host.sort.bam'),
+        host_unmpd_r1 = opj(OUTDIR, 'results/host_mapping/{sample_name}.host.unmapped.R1.fq'),
+        host_unmpd_r2 = opj(OUTDIR, 'results/host_mapping/{sample_name}.host.unmapped.R2.fq'),
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
         stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
         done = touch(opj(OUTDIR, 'done/f_host_mapping/{sample_name}.done')),
@@ -317,9 +317,9 @@ rule f_host_mapping:
     conda:
         "envs/mapping.yaml"
     resources:
-        mem_mb_per_cpu = 2000,
+        mem_mb_per_cpu = 4000,
         runtime        = 2400,
-        disk_mb        = 10000,
+        disk_mb        = 20000,
     shell:
         """
         bowtie2 \
@@ -328,8 +328,9 @@ rule f_host_mapping:
             -1 {input.R1_truncated} \
             -2 {input.R2_truncated} > {output.host_sam};
         
-        samtools view \
+        samtools sort \
             --threads {threads} \
+            -m 3500M \
             -b {output.host_sam} \
             -o {output.host_bam};
 
