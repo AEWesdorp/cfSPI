@@ -32,7 +32,7 @@ PIPELINE_DIR = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../')
 # (i.e. the pipeline dir) that could fly under the radar and use up loads of storage
 workdir: config['outdir'] + '/' + config['output_folder']
 
-## sort memory and disk  requirement 
+## sort memory and disk  requirement
 def get_mem_mb(wildcards, attempt):
     return attempt * 16000
 
@@ -60,15 +60,25 @@ rule all:
         # git version
         expand("{OUTDIR}/git-version.log", OUTDIR=OUTDIR),
 
-        #fastqc
-        expand("{OUTDIR}/done/e_fastqc/{sample_name}.done", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # fastqc
+        expand("{OUTDIR}/done/e_fastqc/{sample_name}.done",
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
-        #mapping to host 
-        expand("{OUTDIR}/results/host_mapping/{sample_name}_aligned_host_pe.bam", sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        # mapping to host
+        expand("{OUTDIR}/results/host_mapping/{sample_name}.host.sort.bam",
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
-        #kraken output
+        # kraken output
         expand("{OUTDIR}/results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report",
                database=config['database'], k2_threshold=config['k2_threshold'],
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
+
+        # insert size metrics
+        expand("{OUTDIR}/results/collect_bam_stats/{sample_name}.bam-stats.isize.tsv",
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
+
+        # NMF analysis/plot
+        expand("{OUTDIR}/plot/NMF/{sample_name}.isize-NMF.png",
                sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #temp additional
@@ -112,9 +122,10 @@ rule a_concat_fastq:
         opj(OUTDIR, 'benchmark/a_concat_fastq/{sample_name}.tsv'),
     resources:
         mem_mb  = 10000,
-        runtime = get_time, 
-        disk_mb = 12000, 
-    threads: 1
+        runtime = get_time,
+        disk_mb = 12000,
+    threads:
+        1
     shell:
         """
         mkdir -p {OUTDIR}/results/tmp
@@ -129,19 +140,21 @@ rule b_unique_nubeam:
         R1_raw = rules.a_concat_fastq.output.R1_raw,
         R2_raw = rules.a_concat_fastq.output.R2_raw,
     output:
-        R1_nubeam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_uniq.fastq.gz')),   
+        R1_nubeam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R1_uniq.fastq.gz')),
         R2_nubeam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_R2_uniq.fastq.gz')),
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_02_uniq_fastq.txt'),
         stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_02_uniq_fastq.txt'),
         done = touch(opj(OUTDIR, 'done/b_unique_nubeam/{sample_name}.done')),
-    priority: 46
+    priority:
+        46
     benchmark:
         opj(OUTDIR, 'benchmark/b_unique_nubeam/{sample_name}.tsv'),
-    threads: 1
+    threads:
+        1
     resources:
         mem_mb  = get_mem_mb,
         runtime = 360,
-        disk    = 12000, 
+        disk    = 12000,
     log:
         log=opj(OUTDIR,"log/b_unique_nubeam/{sample_name}.log"),
     shell:
@@ -173,7 +186,7 @@ rule c_fastp:
     resources:
         mem_mb_per_cpu  = 2000,
         runtime         = get_time_30_120,
-        disk_mb         = 12000, 
+        disk_mb         = 12000,
     log:
         log = opj(OUTDIR, 'log/c_fastp/{sample_name}.log'),
     threads: 16
@@ -210,7 +223,8 @@ rule d_adapter_removal:
         settings = opj(OUTDIR, 'reports/adapter_removal/{sample_name}_adapter_removal_settings.txt'),
         discarded = temp(opj(OUTDIR, 'results/tmp/{sample_name}_trimmed_discarded.fastq.gz')),
         done = touch(opj(OUTDIR, 'done/d_adapter_removal/{sample_name}.done')),
-    priority: 48
+    priority:
+        48
     log:
         log = opj(OUTDIR, 'log/d_adapter_removal/{sample_name}.log'),
     params:
@@ -222,9 +236,10 @@ rule d_adapter_removal:
         base_name = "{sample_name}"
     resources:
         mem_mb_per_cpu = get_mem_mb_per_cpu,
-        runtime        = 90,
-        disk_mb        = get_disk_mb, 
-    threads: 16
+        runtime        = get_time,
+        disk_mb        = get_disk_mb,
+    threads:
+        16
     conda:
         "envs/adapter_removal.yaml"
     benchmark:
@@ -262,14 +277,16 @@ rule e_fastqc:
     output:
         fastqc_dir = directory(opj(OUTDIR, 'reports/fastqc/{sample_name}')),
         done = touch(opj(OUTDIR, 'done/e_fastqc/{sample_name}.done')),
-    priority: 1
+    priority:
+        1
     log:
         log = opj(OUTDIR, 'log/e_fastqc/{sample_name}.log'),
     resources:
         mem_mb_per_cpu  = 2000,
-        runtime         = get_time, 
-        disk_mb         = 30000, 
-    threads: 16
+        runtime         = get_time,
+        disk_mb         = 30000,
+    threads:
+        16
     benchmark:
         opj(OUTDIR, 'benchmark/e_fastqc/{sample_name}.tsv'),
     conda:
@@ -299,7 +316,7 @@ rule e_fastqc:
 rule f_host_mapping:
     input:
         R1_truncated = rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,
     output:
         host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}.host.sam')),
         host_bam = opj(OUTDIR, 'results/host_mapping/{sample_name}.host.sort.bam'),
@@ -308,10 +325,12 @@ rule f_host_mapping:
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_05_host_mapp_fastq.txt'),
         stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_05_host_mapp_fastq.txt'),
         done = touch(opj(OUTDIR, 'done/f_host_mapping/{sample_name}.done')),
-    priority: 49
+    priority:
+        49
     params:
         reference = config['reference_genome_dir'] + '/' + config['reference_genome'],
-    threads: 32
+    threads:
+        32
     benchmark:
         opj(OUTDIR, 'benchmark/f_host_mapping/{sample_name}.tsv'),
     conda:
@@ -327,12 +346,12 @@ rule f_host_mapping:
             -x {params.reference} \
             -1 {input.R1_truncated} \
             -2 {input.R2_truncated} > {output.host_sam};
-        
+
         samtools sort \
             --threads {threads} \
             -m 3500M \
-            -b {output.host_sam} \
-            -o {output.host_bam};
+            -o {output.host_bam} \
+            {output.host_sam};
 
         samtools bam2fq \
             -f 12 \
@@ -350,18 +369,20 @@ rule g_kraken2:
         unm_r2 = rules.f_host_mapping.output.host_unmpd_r2,
     params:
         db = config['database_dir'] + '/' + '{database}',
-        threshold = '{k2_threshold}', 
+        threshold = '{k2_threshold}',
     output:
         k2_report_hm = opj(OUTDIR, 'results/kraken2_report/{sample_name}_{database}_conf{k2_threshold}.report'),
         k2_output_hm = temp(opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output')),
         k2_output_class_hm = opj(OUTDIR, 'results/kraken2_output/{sample_name}_{database}_conf{k2_threshold}.output_classified'),
         done = touch(opj(OUTDIR, 'done/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.done')),
-    priority: 50
+    priority:
+        50
     resources:
         mem_mb  = 128000,
         runtime = 60,
         disk_mb = 128000,
-    threads: 16
+    threads:
+        16
     benchmark:
         opj(OUTDIR, 'benchmark/g_kraken2/{sample_name}_{database}_conf{k2_threshold}.tsv'),
     conda:
@@ -380,10 +401,109 @@ rule g_kraken2:
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
 
+# rule h_collect_insert_sizes:
+#     input:
+#         host_bam = rules.f_host_mapping.output.host_bam,
+#     output:
+#         isize_metrics = opj(OUTDIR, "results/insert_sizes/{sample_name}.insert_size_metrics.txt"),
+#         isize_plot = opj(OUTDIR, 'results/insert_sizes/{sample_name}.insert_size_plot.png'),
+#     threads:
+#         2
+#     resources:
+#         mem_mb_per_cpu = 4000,
+#         runtime        = 60,
+#         disk_mb        = 10000,
+#     priority:
+#         50
+#     log:
+#         log = opj(OUTDIR, 'log/h_collect_insert_sizes/{sample_name}.log'),
+#     benchmark:
+#         opj(OUTDIR, 'benchmark/h_collect_insert_sizes/{sample_name}.tsv'),
+#     conda:
+#         "envs/picard.yaml"
+#     shell:
+#         """
+#         picard CollectInsertSizeMetrics \
+#             --INPUT {input.host_bam} \
+#             --OUTPUT {output.isize_metrics} \
+#             --Histogram_FILE {output.isize_plot} \
+#             --DEVIATIONS 20.0 \
+#             --MINIMUM_PCT 0.001 \
+#             --ASSUME_SORTED true > {log.log} 2>&1
+#         """
+
+rule h_collect_bam_stats:
+    input:
+        host_bam = rules.f_host_mapping.output.host_bam,
+    output:
+        bam_stats = opj(OUTDIR, "results/collect_bam_stats/{sample_name}.bam-stats.txt"),
+        bam_stats_isize = opj(OUTDIR, 'results/collect_bam_stats/{sample_name}.bam-stats.isize.tsv'),
+    params:
+        max_isize = 1200,
+    threads:
+        4
+    resources:
+        mem_mb_per_cpu = 4000,
+        runtime        = 60,
+        disk_mb        = 10000,
+    priority:
+        50
+    log:
+        log = opj(OUTDIR, 'log/i_collect_bam_stats/{sample_name}.log'),
+    benchmark:
+        opj(OUTDIR, 'benchmark/i_collect_bam_stats/{sample_name}.tsv'),
+    conda:
+        "envs/samtools.yaml"
+    shell:
+        """
+        samtools stats \
+            --insert-size {params.max_isize} \
+            --most-inserts 0.999 \
+            --threads {threads} \
+            {input.host_bam} \
+            > {output.bam_stats}
+
+        echo -e "insert_size\tcount" > {output.bam_stats_isize}
+        grep '^IS' {output.bam_stats} | cut -f 2-3 >> {output.bam_stats_isize}
+        """
+
+
+rule i_calculate_plot_nmf:
+    input:
+        bam_stats = rules.h_collect_bam_stats.output.bam_stats_isize,
+    output:
+        nmf_plot = opj(OUTDIR, 'plot/NMF/{sample_name}.isize-NMF.png'),
+        nmf_matrix = opj(OUTDIR, 'results/NMF/{sample_name}.isize-NMF.tsv'),
+    params:
+        script_nmf = os.path.normpath(config['script_nmf']),
+        file_signature = os.path.normpath(config['file_tumor_healthy_signature']),
+    threads:
+        2
+    resources:
+        mem_mb_per_cpu = 4000,
+        runtime        = 60,
+    priority:
+        50
+    log:
+        log = opj(OUTDIR, 'log/i_calculate_plot_nmf/{sample_name}.log'),
+    benchmark:
+        opj(OUTDIR, 'benchmark/i_calculate_plot_nmf/{sample_name}.tsv'),
+    conda:
+        "envs/python.yaml"
+    shell:
+        """
+        python {params.script_nmf} \
+            --samtools-isize-metrics {input.bam_stats} \
+            --signature-file {params.file_signature} \
+            --output-figure {output.nmf_plot} \
+            --output-matrix {output.nmf_matrix}
+        """
+
+
 rule ff_chm13_mapping:
     input:
         R1_truncated = rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,
     output:
         host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_chm13_pe.sam')),
         host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_chm13_pe.bam')),
@@ -391,8 +511,10 @@ rule ff_chm13_mapping:
         host_unmpd_r2 = temp(opj(OUTDIR, 'results/chm13_mapping/{sample_name}_unmapped_chm13_r2.fq')),
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_chm13_mapp_fastq.txt'),
         stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_chm13_mapp_fastq.txt'),
-    priority: 200
-    threads: 32
+    priority:
+        200
+    threads:
+        32
     benchmark:
         opj(OUTDIR, 'benchmark/ff_chm13_mapping/{sample_name}.tsv'),
     params:
@@ -410,7 +532,7 @@ rule ff_chm13_mapping:
             -x {params.ref_genome_dir}/chm13v2.0 \
             -1 {input.R1_truncated} \
             -2 {input.R2_truncated} > {output.host_sam};
-        
+
         samtools view \
             --threads {threads} \
             -b {output.host_sam} \
@@ -421,7 +543,7 @@ rule ff_chm13_mapping:
             -f 12 {output.host_bam} \
             -1 {output.host_unmpd_r1} \
             -2 {output.host_unmpd_r2};
- 
+
         grep -c "^@" {output.host_unmpd_r1} > {output.stats_R1};
         grep -c "^@" {output.host_unmpd_r2} > {output.stats_R2};
         """
@@ -429,7 +551,7 @@ rule ff_chm13_mapping:
 rule ff_grch38_mapping:
     input:
         R1_truncated = rules.d_adapter_removal.output.R1_truncated,
-        R2_truncated = rules.d_adapter_removal.output.R2_truncated,   
+        R2_truncated = rules.d_adapter_removal.output.R2_truncated,
     output:
         host_sam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_grch38_pe.sam')),
         host_bam = temp(opj(OUTDIR, 'results/tmp/{sample_name}_aligned_grch38_pe.bam')),
@@ -437,8 +559,10 @@ rule ff_grch38_mapping:
         host_unmpd_r2 = temp(opj(OUTDIR, 'results/grch38_mapping/{sample_name}_unmapped_grch38_r2.fq')),
         stats_R1 = opj(OUTDIR, 'results/stats/{sample_name}_R1_XX_grch38_mapp_fastq.txt'),
         stats_R2 = opj(OUTDIR, 'results/stats/{sample_name}_R2_XX_grch38_mapp_fastq.txt'),
-    priority: 200
-    threads: 32
+    priority:
+        200
+    threads:
+        32
     benchmark:
         opj(OUTDIR, 'benchmark/ff_grch38_mapping/{sample_name}.tsv'),
     params:
@@ -456,12 +580,12 @@ rule ff_grch38_mapping:
             -x {params.ref_genome_dir}/GCF_000001405.40_GRCh38.p14_genomic \
             -1 {input.R1_truncated} \
             -2 {input.R2_truncated} > {output.host_sam};
-        
+
         samtools view \
             --threads {threads}
             -b {output.host_sam} \
             -o {output.host_bam};
-        
+
         samtools bam2fq \
             --threads {threads} \
             -f 12 {output.host_bam} \
