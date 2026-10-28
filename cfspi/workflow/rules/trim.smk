@@ -3,9 +3,18 @@ import pandas as pd
 
 # unit name = unique name?
 units = (
-    pd.read_csv(config["units"], sep="\t", dtype={"sample_name": str, "library_prep": str})
-    .set_index(["sample_name"], drop=False)
-    .sort_index()
+    pd.read_csv(
+        config['units'],
+        sep='\t',
+        dtype={
+            'sample_name': str,
+            'unit_name':   str
+        },
+        skipinitialspace=True,
+        comment='#',
+    )
+        .set_index('sample_name', drop=False)
+        .sort_index()
 )
 
 base = os.path.normpath(os.path.dirname(workflow.snakefile) + '/../../')
