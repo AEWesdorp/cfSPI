@@ -78,7 +78,9 @@ rule all:
                sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         # NMF analysis/plot
-        expand("{OUTDIR}/plot/NMF/{sample_name}.isize-NMF.png",
+        expand("{OUTDIR}/results/NMF/{sample_name}.isize-NMF.png",
+               sample_name=units['sample_name'], OUTDIR=OUTDIR),
+        expand("{OUTDIR}/results/NMF/{sample_name}.isize-NMF.tsv",
                sample_name=units['sample_name'], OUTDIR=OUTDIR),
 
         #temp additional
@@ -401,37 +403,6 @@ rule g_kraken2:
         grep -v "^U" {output.k2_output_hm} > {output.k2_output_class_hm}
         """
 
-# rule h_collect_insert_sizes:
-#     input:
-#         host_bam = rules.f_host_mapping.output.host_bam,
-#     output:
-#         isize_metrics = opj(OUTDIR, "results/insert_sizes/{sample_name}.insert_size_metrics.txt"),
-#         isize_plot = opj(OUTDIR, 'results/insert_sizes/{sample_name}.insert_size_plot.png'),
-#     threads:
-#         2
-#     resources:
-#         mem_mb_per_cpu = 4000,
-#         runtime        = 60,
-#         disk_mb        = 10000,
-#     priority:
-#         50
-#     log:
-#         log = opj(OUTDIR, 'log/h_collect_insert_sizes/{sample_name}.log'),
-#     benchmark:
-#         opj(OUTDIR, 'benchmark/h_collect_insert_sizes/{sample_name}.tsv'),
-#     conda:
-#         "envs/picard.yaml"
-#     shell:
-#         """
-#         picard CollectInsertSizeMetrics \
-#             --INPUT {input.host_bam} \
-#             --OUTPUT {output.isize_metrics} \
-#             --Histogram_FILE {output.isize_plot} \
-#             --DEVIATIONS 20.0 \
-#             --MINIMUM_PCT 0.001 \
-#             --ASSUME_SORTED true > {log.log} 2>&1
-#         """
-
 rule h_collect_bam_stats:
     input:
         host_bam = rules.f_host_mapping.output.host_bam,
@@ -449,9 +420,9 @@ rule h_collect_bam_stats:
     priority:
         50
     log:
-        log = opj(OUTDIR, 'log/i_collect_bam_stats/{sample_name}.log'),
+        log = opj(OUTDIR, 'log/h_collect_bam_stats/{sample_name}.log'),
     benchmark:
-        opj(OUTDIR, 'benchmark/i_collect_bam_stats/{sample_name}.tsv'),
+        opj(OUTDIR, 'benchmark/h_collect_bam_stats/{sample_name}.tsv'),
     conda:
         "envs/samtools.yaml"
     shell:
@@ -467,16 +438,25 @@ rule h_collect_bam_stats:
         grep '^IS' {output.bam_stats} | cut -f 2-3 >> {output.bam_stats_isize}
         """
 
-
 rule i_calculate_plot_nmf:
     input:
-        bam_stats = rules.h_collect_bam_stats.output.bam_stats_isize,
+        expand(
+            rules.h_collect_bam_stats.output.bam_stats_isize,
+            sample_name=units['sample_name']
+        ),
     output:
-        nmf_plot = opj(OUTDIR, 'plot/NMF/{sample_name}.isize-NMF.png'),
-        nmf_matrix = opj(OUTDIR, 'results/NMF/{sample_name}.isize-NMF.tsv'),
+        nmf_plot = expand(
+            opj(OUTDIR, 'results/NMF/{sample}.isize-NMF.png'),
+            sample=units['sample_name']
+        ),
+        nmf_matrix = expand(
+            opj(OUTDIR, 'results/NMF/{sample}.isize-NMF.tsv'),
+            sample=units['sample_name']
+        ),
     params:
-        script_nmf = os.path.normpath(config['script_nmf']),
-        file_signature = os.path.normpath(config['file_tumor_healthy_signature']),
+        script_nmf_relpath = config['script_nmf'],
+        file_signature_relpath = config['file_tumor_healthy_signature'],
+        output_directory = opj(OUTDIR, 'results/NMF'),
     threads:
         2
     resources:
@@ -485,20 +465,19 @@ rule i_calculate_plot_nmf:
     priority:
         50
     log:
-        log = opj(OUTDIR, 'log/i_calculate_plot_nmf/{sample_name}.log'),
+        log = opj(OUTDIR, 'log/i_calculate_plot_nmf/NMF.log'),
     benchmark:
-        opj(OUTDIR, 'benchmark/i_calculate_plot_nmf/{sample_name}.tsv'),
+        opj(OUTDIR, 'benchmark/i_calculate_plot_nmf/NMF.tsv'),
     conda:
         "envs/python.yaml"
     shell:
         """
-        python {params.script_nmf} \
-            --samtools-isize-metrics {input.bam_stats} \
-            --signature-file {params.file_signature} \
-            --output-figure {output.nmf_plot} \
-            --output-matrix {output.nmf_matrix}
+        python {PIPELINE_DIR}/{params.script_nmf_relpath} \
+            --samtools-isize-metrics {input} \
+            --signature-file {PIPELINE_DIR}/{params.file_signature_relpath} \
+            --output-directory {params.output_directory} \
+            --output-matrix
         """
-
 
 rule ff_chm13_mapping:
     input:
