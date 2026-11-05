@@ -1,0 +1,14 @@
+name: python
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - matplotlib
+  - numpy
+  - pandas
+  - polars
+  - python
+  - pyarrow
+  - seaborn
+  - scikit-learn
+  - scipy

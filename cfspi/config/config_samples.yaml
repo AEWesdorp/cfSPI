@@ -22,6 +22,12 @@ database_dir: /example/database/directory/
 k2_threshold: [0.4]
 
 ############################################ DO NOT MODIFY ############################################
+# scripts
+script_nmf: ./workflow/scripts/calculate_plot_isize_nmf.py
+
+# resource files
+file_tumor_healthy_signature: ./resources/Renaud_et_al_Fig2B_WGS_Sigs_data.tsv
+
 # adapter files
 file_srsly: ./resources/adapter_indexes/SRSLY_index.txt
 file_idt384umi: ./resources/adapter_indexes/IDT384UMI_index.txt
